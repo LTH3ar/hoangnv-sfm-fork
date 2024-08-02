@@ -85,10 +85,14 @@
   },
   "runDirection": {
     "description": "AGV run direction (1 - same direction, 0 - opposite direction)",
-    "value": 0
+    "value": 1
   },
   "experimentalDeviation": {
     "description": "Experimental deviation (percent)",
     "value": 10
+  },
+  "jsonOutput": {
+    "description": "Output file in JSON format",
+    "value": 1
   }
 }

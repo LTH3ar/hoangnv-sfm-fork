@@ -140,8 +140,10 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                           int numRunPerHallway, int totalRunningTime)
 {
     ofstream output(fileName, ios::app);
+    json j;
 
     int easyReadingMode = 1;
+    int jsonOutput = 1;
     std::string delimiter = " - ";
     std::time_t now =
         std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -167,6 +169,10 @@ void Utility::writeResult(const char *fileName, string name, int mode,
         {
             output << "\n\t*#* Completed on " << std::ctime(&now);
         }
+        if (jsonOutput == 1)
+        {
+            j["Completed_on"] = std::ctime(&now);
+        }
 
         string hallwayName;
         float hallwayLength;
@@ -176,6 +182,13 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
         for (AGV *agv : agvs)
         {
+            string json_filename = "data/result_agv_" + std::to_string(agv->getId()) + ".json";
+            // clean up file
+            std::ofstream ofs;
+            ofs.open(json_filename, std::ofstream::out | std::ofstream::trunc);
+            ofs.close();
+
+            ofstream JsonOutput(json_filename, ios::app);
             if (agv->getNumOfCollision() == 0)
             {
                 agv->setTotalStopTime(0);
@@ -200,6 +213,15 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                            << "Collisions " << agv->getNumOfCollision() << delimiter
                            << "Total stop time " << convertTime(agv->getTotalStopTime()) << endl;
                 }
+                if (jsonOutput == 1)
+                {
+                    j["hallwayName"] = hallwayName;
+                    j["hallwayLength"] = hallwayLength;
+                    j["agvId"] = agv->getId();
+                    j["travelingTime"] = convertTime(agv->getTravelingTime());
+                    j["numOfCollision"] = agv->getNumOfCollision();
+                    j["totalStopTime"] = convertTime(agv->getTotalStopTime());
+                }
             }
 
             if (agv->getId() == marker)
@@ -220,13 +242,26 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     output << "Average time to travel through the hallway " << hallwayName
                            << " is " << convertTime((int)avgTime) << "\n"
                            << endl;
-                } else {
+                }
+                else if (jsonOutput == 1)
+                {
+                    j["shortest"] = minValue;
+                    j["longest"] = maxValue;
+                    j["averageTime"] = avgTime;
+                } 
+                else {
                     output << hallwayLength << " " << minValue << " " << maxValue << " " << avgTime << endl;
                 }
 
                 travelingTimeList.clear();
                 juncIndexTemp = juncIndexTemp + 1;
+                if (jsonOutput == 1)
+                {
+                    j["totalRunningTime"] = totalRunningTime;
+                }
             }
+            JsonOutput << j.dump(4) << endl;
+            JsonOutput.close();
         }
     }
 

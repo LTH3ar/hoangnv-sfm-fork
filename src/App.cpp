@@ -557,6 +557,7 @@ void createAGVs()
         {
             numAGVPerRun = 2;
         }
+        std::cout << int(inputData["runDirection"]["value"]) << endl;
         if (int(inputData["runDirection"]["value"]) == 1)
         {
             agvDirection = 1; // Same direction
@@ -602,6 +603,7 @@ void createAGVs()
                         marker = numRunPerHallway * 2 * (juncIndexTemp + 1) - 1;
                         std::cout << "Marker: " << marker << endl;
                     }
+                    std::cout << "AGV ID: " << agv->getId() << endl;
                     if (agv->getId() == marker)
                     {
                         juncIndexTemp = juncIndexTemp + 1;
@@ -680,6 +682,7 @@ void createAGVs()
                         marker = numRunPerHallway * 2 * (juncIndexTemp + 1) - 1;
                         std::cout << "Marker: " << marker << endl;
                     }
+                    std::cout << "AGV ID: " << agv->getId() << endl;
                     if (agv->getId() == marker)
                     {
                         juncIndexTemp = juncIndexTemp + 1;
@@ -839,7 +842,9 @@ void update()
         }
 
         Point3f src = agv->getPosition();
+        //std::cout << "Source: " << src << endl;
         Point3f des = agv->getDestination();
+        //std::cout << "Destination: " << des << endl;
 
         float distance = src.distance(des);
         if (distance <= 1 || isnan(distance))
@@ -847,6 +852,7 @@ void update()
             if (agv->getIsMoving())
             {
                 agv->setTravelingTime(glutGet(GLUT_ELAPSED_TIME) - agv->getTravelingTime());
+                std::cout << "Traveling time: " << convertTime(agv->getTravelingTime()) << endl;
                 agv->setIsMoving(false);
 
                 int numAGVCompleted = getNumAGVCompleted(socialForce->getAGVs());
@@ -892,6 +898,7 @@ void update()
     if (count_agvs == agvs.size())
     {
         int totalRunningTime = currTime - startTime;
+        
         Utility::writeResult(
             "data/end.txt", juncName, inputData["graphicsMode"]["value"], agvs,
             juncDataList,
@@ -917,3 +924,4 @@ void update()
     glutPostRedisplay();
     glutIdleFunc(update); // Continuously execute 'update()'
 }
+// tích hợp hành vi người đi bộ vào phần mêm mô phỏng thuật toán định tuyến AGV

@@ -1,5 +1,10 @@
 # Simulator measures the influence of people on AGVs using Social Force Model
 
+## Fork Information
+
+- This project is a fork of the original project [here](https://github.com/bkhnk48/hoangnv-sfm.git) by [HoangNV](https://github.com/bkhnk48)
+- This fork add some features to work with the project [here](https://github.com/bkhnk48/pathPlanningSimulation.git)
+
 ## Social Force Model
 The Social Force Model (SFM) is a mathematical model used to describe the movement of individuals in crowded spaces. It was first proposed by Dirk Helbing and Péter Molnár in 1995. 
 
@@ -35,5 +40,5 @@ make
 To run simulator
 
 ```cpp
-./app
+./app <json file> <map(txt) file>
 ```
