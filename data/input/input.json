@@ -13,7 +13,7 @@
   },
   "numOfAgents": {
     "description": "Number of agents",
-    "value": 50
+    "value": 10
   },
   "TDDegree": {
     "description": "T-Distribution' degree of freedom",
@@ -81,7 +81,7 @@
   },
   "runConcurrently": {
     "description": "AGV run concurrently",
-    "value": 1
+    "value": 0
   },
   "runDirection": {
     "description": "AGV run direction (1 - same direction, 0 - opposite direction)",

@@ -132,6 +132,23 @@ json Utility::readInputData(const char *fileName)
     return data;
 }
 
+void CleanUpData(const char *folderName)
+{
+    //remove file has "result_agv_" in the name and end with ".json"
+    std::string folder(folderName);
+    std::string search = "result_agv_";
+    std::string ext = ".json";
+    for (const auto &entry : std::filesystem::directory_iterator(folder))
+    {
+        std::string filename = entry.path().filename().string();
+        if (filename.find(search) != std::string::npos && filename.find(ext) != std::string::npos)
+        {
+            std::filesystem::remove(entry.path());
+        }
+    }
+
+}
+
 // write end file
 void Utility::writeResult(const char *fileName, string name, int mode,
                           std::vector<AGV *> agvs,
@@ -139,6 +156,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                           int agvRunConcurrently, int runMode,
                           int numRunPerHallway, int totalRunningTime)
 {
+    CleanUpData("data/output");
     ofstream output(fileName, ios::app);
     json j;
 
@@ -182,7 +200,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
         for (AGV *agv : agvs)
         {
-            string json_filename = "data/result_agv_" + std::to_string(agv->getId()) + ".json";
+            string json_filename = "data/output/result_agv_" + std::to_string(agv->getId()) + ".json";
             // clean up file
             std::ofstream ofs;
             ofs.open(json_filename, std::ofstream::out | std::ofstream::trunc);
