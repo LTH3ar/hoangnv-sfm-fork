@@ -9,11 +9,11 @@
   },
   "graphicsMode": {
     "description": "Graphics mode (1 - Graphics, 0 - No Graphics)",
-    "value": 1
+    "value": 0
   },
   "numOfAgents": {
     "description": "Number of agents",
-    "value": 10
+    "value": 50
   },
   "TDDegree": {
     "description": "T-Distribution' degree of freedom",
@@ -81,11 +81,11 @@
   },
   "runConcurrently": {
     "description": "AGV run concurrently",
-    "value": 0
+    "value": 1
   },
   "runDirection": {
     "description": "AGV run direction (1 - same direction, 0 - opposite direction)",
-    "value": 1
+    "value": 0
   },
   "experimentalDeviation": {
     "description": "Experimental deviation (percent)",
@@ -94,5 +94,9 @@
   "jsonOutput": {
     "description": "Output file in JSON format",
     "value": 1
+  },
+  "timeRatio": {
+    "description": "Frame ratio for graphics and run mode",
+    "value": 1000
   }
 }

@@ -43,6 +43,7 @@ namespace Utility
     std::vector<float> getWallCoordinates(float walkwayWidth, std::vector<float> juncData);
 
     std::string convertTime(int milliseconds);
+    std::string rendererTime(int milliseconds);
 
     std::vector<float> getMapLimit(float walkwayWidth, std::vector<float> juncData);
 

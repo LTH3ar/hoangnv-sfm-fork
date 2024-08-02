@@ -782,7 +782,7 @@ void update()
     int count_agents = 0, count_agvs = 0;
 
     std::vector<Agent *> agents = socialForce->getCrowd();
-    string run_time = convertTime(currTime - startTime);
+    string run_time = convertTime((currTime - startTime));
     for (Agent *agent : agents)
     {
         Point3f src = agent->getPosition();
@@ -913,7 +913,7 @@ void update()
             totalRunningTime);
 
         std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
-        std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << endl;
+        std::cout << "Finish in: " << convertTime(totalRunningTime) << endl;
         delete socialForce;
         socialForce = 0;
 
@@ -922,8 +922,10 @@ void update()
 
     if (animate)
     {
-        socialForce->moveCrowd(static_cast<float>(frameTime) / 1000); // Perform calculations and move agents
-        socialForce->moveAGVs(static_cast<float>(frameTime) / 1000);
+        // socialForce->moveCrowd(static_cast<float>(frameTime) / 1000); // Perform calculations and move agents
+        // socialForce->moveAGVs(static_cast<float>(frameTime) / 1000);
+        socialForce->moveCrowd(static_cast<float>(frameTime) / (int)inputData["timeRatio"]["value"]); // Perform calculations and move agents
+        socialForce->moveAGVs(static_cast<float>(frameTime) / (int)inputData["timeRatio"]["value"]);
     }
     computeFPS(&fps);
     glutPostRedisplay();

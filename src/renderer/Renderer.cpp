@@ -293,11 +293,11 @@ void Renderer::showInformation(
     drawText(margin.x, margin.y - 1.8F, "Simulation time:");
     if (animate)
     {
-        s = convertTime(currTime - startTime);
+        s = rendererTime((currTime - startTime));
     }
     else
     {
-        s = convertTime(0);
+        s = rendererTime(0);
     }
 
     drawText(

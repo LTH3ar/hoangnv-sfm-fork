@@ -19,6 +19,8 @@ using namespace std;
 using namespace Constant;
 using namespace Utility;
 
+// json j = Utility::readInputData("data/input/input.json");
+int timeRatio = 1000/(int)Utility::readInputData("data/input/input.json")["timeRatio"]["value"];
 // random float number between particular range
 float Utility::randomFloat(float lowerBound, float upperBound)
 {
@@ -491,6 +493,28 @@ std::vector<float> Utility::getWallCoordinates(float walkwayWidth,
 
 // Convert miliseconds to pretty form
 std::string Utility::convertTime(int ms)
+{
+    ms = ms * timeRatio;
+    
+    // 3600000 milliseconds in an hour
+    long hr = ms / 3600000;
+    ms = ms - 3600000 * hr;
+
+    // 60000 milliseconds in a minute
+    long min = ms / 60000;
+    ms = ms - 60000 * min;
+
+    // 1000 milliseconds in a second
+    long sec = ms / 1000;
+    ms = ms - 1000 * sec;
+
+    return std::to_string(hr) + std::string("h ") + std::to_string(min) +
+           std::string("m ") + std::to_string(sec) + std::string("s ") +
+           std::to_string(ms) + std::string("ms");
+}
+
+// Convert miliseconds to pretty form
+std::string Utility::rendererTime(int ms)
 {
     // 3600000 milliseconds in an hour
     long hr = ms / 3600000;

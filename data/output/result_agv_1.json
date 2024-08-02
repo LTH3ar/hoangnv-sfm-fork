@@ -1,9 +1,10 @@
 {
     "Completed_on": "Fri Aug  2 18:45:28 2024\n",
-    "agvId": 0,
+    "agvId": 1,
     "hallwayLength": 5.0,
     "hallwayName": "J1_0",
     "numOfCollision": 1,
-    "totalStopTime": "0h 0m 1s 654ms",
-    "travelingTime": "0h 0m 24s 193ms"
+    "totalRunningTime": 24205,
+    "totalStopTime": "0h 0m 0s 773ms",
+    "travelingTime": "0h 0m 23s 106ms"
 }
