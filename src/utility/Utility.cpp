@@ -492,6 +492,7 @@ std::vector<float> Utility::getWallCoordinates(float walkwayWidth,
 // Convert miliseconds to pretty form
 std::string Utility::convertTime(int ms)
 {
+    //cout << "ms: " << ms << endl;
     // 3600000 milliseconds in an hour
     long hr = ms / 3600000;
     ms = ms - 3600000 * hr;

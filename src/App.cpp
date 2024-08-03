@@ -27,6 +27,8 @@ bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
 
 json inputData;
+json configData;
+int timeRatio;
 std::map<std::string, std::vector<float>> mapData;
 std::vector<json> juncDataList;
 std::vector<float> juncData;
@@ -64,9 +66,11 @@ int main(int argc, char **argv)
     // mapData = Utility::readMapData("data/map.txt");
     inputData = Utility::readInputData(argv[1]);
     mapData = Utility::readMapData(argv[2]);
+    configData = Utility::readInputData("data/configuration.json");
+    timeRatio = (int)configData["timeRatio"]["value"];
     std::string input1;
 
-    if ((int)inputData["runMode"]["value"] == 0)
+    if ((int)configData["runMode"]["value"] == 0)
     {
         do
         {
@@ -128,7 +132,7 @@ int main(int argc, char **argv)
 
     animate = true;
     startTime = currTime;
-    if ((int)inputData["graphicsMode"]["value"] == 0)
+    if ((int)configData["graphicsMode"]["value"] == 0)
     {
         glutHideWindow();
     }
@@ -484,7 +488,7 @@ void createAGVs()
     // socialForce->addAGV(agv);
 
     // test
-    if ((int)inputData["runMode"]["value"] == 0)
+    if ((int)configData["runMode"]["value"] == 0)
     {
         for (int i = 0; i < juncData.size(); i++)
         {
@@ -727,7 +731,7 @@ void display()
     glScalef(1.0, 1.0, 1.0);
 
     drawAgents(socialForce);
-    drawAGVs(socialForce, juncData, (int)inputData["runConcurrently"]["value"], (int)inputData["runMode"]["value"]);
+    drawAGVs(socialForce, juncData, (int)inputData["runConcurrently"]["value"], (int)configData["runMode"]["value"]);
     drawWalls(socialForce);
     glPopMatrix();
 
@@ -782,7 +786,7 @@ void update()
     int count_agents = 0, count_agvs = 0;
 
     std::vector<Agent *> agents = socialForce->getCrowd();
-    string run_time = convertTime(currTime - startTime);
+    string run_time = convertTime((currTime - startTime)*(1000/timeRatio));
     for (Agent *agent : agents)
     {
         Point3f src = agent->getPosition();
@@ -905,15 +909,15 @@ void update()
         int totalRunningTime = currTime - startTime;
         
         Utility::writeResult(
-            "data/end.txt", juncName, inputData["graphicsMode"]["value"], agvs,
+            "data/end.txt", juncName, configData["graphicsMode"]["value"], agvs,
             juncDataList,
             (int)inputData["runConcurrently"]["value"],
-            (int)inputData["runMode"]["value"],
+            (int)configData["runMode"]["value"],
             (int)inputData["noRunPerHallway"]["value"],
             totalRunningTime);
 
         std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
-        std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << endl;
+        std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
         delete socialForce;
         socialForce = 0;
 
@@ -922,8 +926,10 @@ void update()
 
     if (animate)
     {
-        socialForce->moveCrowd(static_cast<float>(frameTime) / 1000); // Perform calculations and move agents
-        socialForce->moveAGVs(static_cast<float>(frameTime) / 1000);
+        // socialForce->moveCrowd(static_cast<float>(frameTime) / 1000); // Perform calculations and move agents
+        // socialForce->moveAGVs(static_cast<float>(frameTime) / 1000);
+        socialForce->moveCrowd(static_cast<float>(frameTime) / timeRatio); // Perform calculations and move agents
+        socialForce->moveAGVs(static_cast<float>(frameTime) / timeRatio);
     }
     computeFPS(&fps);
     glutPostRedisplay();

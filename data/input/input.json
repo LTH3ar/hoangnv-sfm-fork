@@ -1,14 +1,6 @@
 {
-  "runMode": {
-    "description": "Run mode (1 - Statistical calculation, 0 - Test)",
-    "value": 1
-  },
   "noRunPerHallway": {
     "description": "Number of times the AGV runs for each hallway",
-    "value": 1
-  },
-  "graphicsMode": {
-    "description": "Graphics mode (1 - Graphics, 0 - No Graphics)",
     "value": 1
   },
   "numOfAgents": {
@@ -90,9 +82,5 @@
   "experimentalDeviation": {
     "description": "Experimental deviation (percent)",
     "value": 10
-  },
-  "jsonOutput": {
-    "description": "Output file in JSON format",
-    "value": 1
   }
 }
