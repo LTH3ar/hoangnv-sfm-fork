@@ -154,7 +154,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                           std::vector<AGV *> agvs,
                           std::vector<json> juncDataList,
                           int agvRunConcurrently, int runMode,
-                          int numRunPerHallway, int totalRunningTime)
+                          int numRunPerHallway, int totalRunningTime, int timeRatio)
 {
     CleanUpData("data/output");
     ofstream output(fileName, ios::app);
@@ -177,7 +177,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
             string direction = array1[(int)(agv->getDirection().x)] + "-" +
                                array2[(int)(agv->getDirection().y)];
             output << name << delimiter << mode << delimiter << direction << delimiter
-                   << convertTime(agv->getTravelingTime()) << delimiter
+                   << convertTime(agv->getTravelingTime()*(1000/timeRatio)) << delimiter
                    << agv->getNumOfCollision() << endl;
         }
     }
@@ -227,18 +227,18 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                 {
                     output << hallwayName << delimiter << hallwayLength << ": AGV ID "
                            << agv->getId() << delimiter
-                           << convertTime(agv->getTravelingTime()) << delimiter
+                           << convertTime(agv->getTravelingTime()*(1000/timeRatio)) << delimiter
                            << "Collisions " << agv->getNumOfCollision() << delimiter
-                           << "Total stop time " << convertTime(agv->getTotalStopTime()) << endl;
+                           << "Total stop time " << convertTime(agv->getTotalStopTime()*(1000/timeRatio)) << endl;
                 }
                 if (jsonOutput == 1)
                 {
                     j["hallwayName"] = hallwayName;
                     j["hallwayLength"] = hallwayLength;
                     j["agvId"] = agv->getId();
-                    j["travelingTime"] = convertTime(agv->getTravelingTime());
+                    j["travelingTime"] = convertTime(agv->getTravelingTime()*(1000/timeRatio));
                     j["numOfCollision"] = agv->getNumOfCollision();
-                    j["totalStopTime"] = convertTime(agv->getTotalStopTime());
+                    j["totalStopTime"] = convertTime(agv->getTotalStopTime()*(1000/timeRatio));
                 }
             }
 
@@ -255,17 +255,17 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
                 if (easyReadingMode == 1)
                 {
-                    output << "Shortest: " << convertTime(minValue)
-                           << " - Longest: " << convertTime(maxValue) << endl;
+                    output << "Shortest: " << convertTime(minValue*(1000/timeRatio))
+                           << " - Longest: " << convertTime(maxValue*(1000/timeRatio)) << endl;
                     output << "Average time to travel through the hallway " << hallwayName
-                           << " is " << convertTime((int)avgTime) << "\n"
+                           << " is " << convertTime((int)avgTime*(1000/timeRatio)) << "\n"
                            << endl;
                 }
                 else if (jsonOutput == 1)
                 {
-                    j["shortest"] = minValue;
-                    j["longest"] = maxValue;
-                    j["averageTime"] = avgTime;
+                    j["shortest"] = minValue*(1000/timeRatio);
+                    j["longest"] = maxValue*(1000/timeRatio);
+                    j["averageTime"] = avgTime*(1000/timeRatio);
                 } 
                 else {
                     output << hallwayLength << " " << minValue << " " << maxValue << " " << avgTime << endl;
@@ -275,7 +275,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                 juncIndexTemp = juncIndexTemp + 1;
                 if (jsonOutput == 1)
                 {
-                    j["totalRunningTime"] = totalRunningTime;
+                    j["totalRunningTime"] = totalRunningTime*(1000/timeRatio);
                 }
             }
             JsonOutput << j.dump(4) << endl;

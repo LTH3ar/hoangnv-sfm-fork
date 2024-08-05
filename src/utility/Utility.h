@@ -30,7 +30,8 @@ namespace Utility
         int agvRunConcurrently,
         int runMode,
         int numRunPerHallway,
-        int totalRunningTime);
+        int totalRunningTime,
+        int timeRatio);
 
     std::vector<int> getNumPedesInFlow(int junctionType, int totalPedestrian);
 
