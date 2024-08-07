@@ -24,6 +24,8 @@ namespace Utility
 
     json readInputData(const char *fileName);
 
+    int calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, int timeRatio);
+
     void writeResult(
         const char *fileName, std::string name, int mode, std::vector<AGV *> data,
         std::vector<json> juncDataList,

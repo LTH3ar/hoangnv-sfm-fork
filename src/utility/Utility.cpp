@@ -28,6 +28,34 @@ float Utility::randomFloat(float lowerBound, float upperBound)
     return dis(gen);
 }
 
+// calculate predicted time
+int Utility::calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, int timeRatio) {
+    // Time to reach desired speed
+    float t1 = desiredSpeed / acceleration;
+    
+    // Distance covered during acceleration
+    float d1 = 0.5 * acceleration * t1 * t1;
+    
+    // Check if the distance covered during acceleration is less than the total distance
+    if (d1 <= hallwayLength) {
+        // Remaining distance after reaching desired speed
+        float d2 = hallwayLength - d1;
+        
+        // Time to cover the remaining distance at constant speed
+        float t2 = d2 / desiredSpeed;
+        
+        // Total time
+        return (t1 + t2)*timeRatio;
+    } else {
+        // If the object does not reach the desired speed, solve for time using quadratic equation
+        // d = 0.5 * a * t^2
+        // 0.5 * a * t^2 = d
+        // t^2 = 2 * d / a
+        // t = sqrt(2 * d / a)
+        return sqrt(2 * hallwayLength / acceleration)*timeRatio;
+    }
+}
+
 // read map data file
 std::map<std::string, std::vector<float>> Utility::readMapData(
     const char *fileName)

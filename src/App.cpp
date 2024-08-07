@@ -26,6 +26,7 @@ SocialForce *socialForce;
 float fps = 0; // Frames per second
 int currTime = 0;
 int startTime = 0;
+int predictedTime = 0;
 bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
 
@@ -34,6 +35,7 @@ int timeRatio = 1;
 int runMode = 1;
 int graphicsMode = 1;
 int jsonOutput = 1;
+
 std::map<std::string, std::vector<float>> mapData;
 std::vector<json> juncDataList;
 std::vector<float> juncData;
@@ -65,6 +67,7 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos);
 
 void update();
 
+
 int main(int argc, char **argv)
 {
     // inputData = Utility::readInputData("data/input.json");
@@ -83,10 +86,17 @@ int main(int argc, char **argv)
     juncDataList = Utility::convertMapData(mapData);
     float hallwayLength = juncDataList[juncIndex].items().begin().value();
 
+    cout << "Hallway length: " << hallwayLength << endl;
+    cout << "desired speed: " << inputData["agvDesiredSpeed"]["value"] << endl;
+
     walkwayWidth = (float)inputData["hallwayWidth"]["value"];
     float length1Side = (hallwayLength) / 2;
     juncData = {length1Side, length1Side};
     
+    // Calculate predicted time: input(hallway length+9, desired speed, acceleration), output(predicted completion time)
+    predictedTime = Utility::calculatePredictedTime(hallwayLength + 9, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
+
+    cout << "Predicted time: " << predictedTime << endl;
 
     float deviationParam = randomFloat(1 - (float)inputData["experimentalDeviation"]["value"] / 100, 1 + (float)inputData["experimentalDeviation"]["value"] / 100);
     // Threshold people stopping at the corridor
@@ -704,7 +714,6 @@ void update()
         Point3f des = agent->getDestination();
         
         cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agent->getVelocity().length() << endl;
-
         if (Utility::isPositionErr(src, walkwayWidth, juncData.size(), socialForce->getAGVs()))
         {
             socialForce->removeAgent(agent->getId());
@@ -818,6 +827,19 @@ void update()
     if (count_agvs == agvs.size())
     {
         int totalRunningTime = currTime - startTime;
+
+        if (currTime >= predictedTime){
+            cout << "Time out" << endl;
+            Utility::writeResult(
+                "data/end.txt", juncName, graphicsMode, agvs,
+                juncDataList,
+                (int)inputData["runConcurrently"]["value"],
+                runMode,
+                (int)inputData["noRunPerHallway"]["value"],
+                totalRunningTime,
+                timeRatio);
+            exit(0); // Terminate program
+        }
         
         Utility::writeResult(
             "data/end.txt", juncName, graphicsMode, agvs,
