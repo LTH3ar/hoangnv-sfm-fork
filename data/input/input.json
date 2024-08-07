@@ -1,15 +1,7 @@
 {
-  "runMode": {
-    "description": "Run mode (1 - Statistical calculation, 0 - Test)",
-    "value": 1
-  },
   "noRunPerHallway": {
     "description": "Number of times the AGV runs for each hallway",
     "value": 1
-  },
-  "graphicsMode": {
-    "description": "Graphics mode (1 - Graphics, 0 - No Graphics)",
-    "value": 0
   },
   "numOfAgents": {
     "description": "Number of agents",
@@ -21,7 +13,7 @@
   },
   "totalCrowdLength": {
     "description": "Crowd total length",
-    "value": 40
+    "value": 50
   },
   "headCrowdLength": {
     "description": "Crowd head/tail length",
@@ -90,13 +82,5 @@
   "experimentalDeviation": {
     "description": "Experimental deviation (percent)",
     "value": 10
-  },
-  "jsonOutput": {
-    "description": "Output file in JSON format",
-    "value": 1
-  },
-  "timeRatio": {
-    "description": "Frame ratio for graphics and run mode",
-    "value": 1000
   }
 }
