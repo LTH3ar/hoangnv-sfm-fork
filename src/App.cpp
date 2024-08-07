@@ -802,7 +802,7 @@ void update()
         Point3f src = agent->getPosition();
         Point3f des = agent->getDestination();
         
-        cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << endl;
+        cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agent->getVelocity().length() << endl;
 
         if (Utility::isPositionErr(src, walkwayWidth, juncData.size(), socialForce->getAGVs()))
         {
@@ -863,7 +863,7 @@ void update()
         //std::cout << "Source: " << src << endl;
         Point3f des = agv->getDestination();
         //std::cout << "Destination: " << des << endl;
-        cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << endl;
+        cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agv->getVelocity().length() << endl;
 
         float distance = src.distance(des);
         if (distance <= 1 || isnan(distance))

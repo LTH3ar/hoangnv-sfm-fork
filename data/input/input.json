@@ -73,7 +73,7 @@
   },
   "runConcurrently": {
     "description": "AGV run concurrently",
-    "value": 1
+    "value": 0
   },
   "runDirection": {
     "description": "AGV run direction (1 - same direction, 0 - opposite direction)",
