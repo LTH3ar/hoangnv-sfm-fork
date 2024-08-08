@@ -480,15 +480,22 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
 // write state
 void Utility::writeState(const char *fileName, std::vector<json> stateList)
 {
+    // clean up file
+    std::ofstream ofs;
+    ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
     ofstream output(fileName, ios::app);
     output << "[" << endl;
+    int counter = 0;
     for (json j : stateList)
     {
         output << j.dump(4) << endl;
-        if (&j != &stateList.back())
+        if (counter < stateList.size() - 1)
         {
             output << "," << endl;
         }
+        counter++;
     }
     output << "]" << endl;
     output.close();
