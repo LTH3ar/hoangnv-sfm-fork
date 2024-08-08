@@ -8,6 +8,7 @@
 #include "lib/vecmath/vecmath.h"
 #include <map>
 #include "src/agv/AGV.h"
+#include "src/agent/Agent.h"
 
 using json = nlohmann::json;
 
@@ -34,6 +35,20 @@ namespace Utility
         int numRunPerHallway,
         int totalRunningTime,
         int timeRatio);
+
+    json SaveState(
+        // list of AGVs
+        std::vector<AGV *> agvs,
+        // list of Agents
+        std::vector<Agent *> agents,
+        // time stamp (ms)
+        int time
+    );
+
+    void writeState(
+        const char *fileName,
+        std::vector<json> stateList
+    );
 
     std::vector<int> getNumPedesInFlow(int junctionType, int totalPedestrian);
 

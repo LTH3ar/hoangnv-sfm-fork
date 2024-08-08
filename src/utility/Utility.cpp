@@ -319,6 +319,182 @@ void Utility::writeResult(const char *fileName, string name, int mode,
     output.close();
 }
 
+// Save state
+json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
+                        int time)
+{
+    /*structure of json file
+    [
+        {
+            "time": 0,
+            "agvs": [
+                {
+                    "id": 0,
+                    "position": [0, 0],
+                    "velocity": 1.2,
+                    "direction": [0, 0]
+                }
+            ],
+            "agents": [
+                {
+                    "id": 0,
+                    "position": [0, 0],
+                    "velocity": 1.2,
+                    "direction": [0, 0]
+                }
+            ]
+        }
+    ]
+    */
+    json j;
+    j["time"] = time;
+    std::vector<json> agvList;
+    for (AGV *agv : agvs)
+    {
+        json agvJson;
+        agvJson["id"] = agv->getId();
+        agvJson["position"] = {agv->getPosition().x, agv->getPosition().y};
+        agvJson["direction"] = {agv->getDirection().x, agv->getDirection().y};
+        agvList.push_back(agvJson);
+    }
+
+    std::vector<json> agentList;
+    for (Agent *agent : agents)
+    {
+        json agentJson;
+        agentJson["id"] = agent->getId();
+        
+        // color
+        /*
+        {
+            "red": 0.0,
+            "green": 0.0,
+            "blue": 0.0
+        }
+        */
+        agentJson["color"] = {
+            agent->getColor().x,
+            agent->getColor().y,
+            agent->getColor().z
+        };
+
+        // position
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agentJson["position"] = {
+            agent->getPosition().x, 
+            agent->getPosition().y
+        };
+
+        // desiredSpeed
+        agentJson["desiredSpeed"] = agent->getDesiredSpeed();
+
+        // velocity(Vector3f)
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agentJson["velocity"] = {
+            agent->getVelocity().x,
+            agent->getVelocity().y
+        };
+
+        // destination(Point3f)
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agentJson["destination"] = {
+            agent->getDestination().x,
+            agent->getDestination().y
+        };
+
+        // position(Point3f)
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agentJson["position"] = {
+            agent->getPosition().x,
+            agent->getPosition().y
+        };
+
+        // isMoving(bool)
+        agentJson["isMoving"] = agent->getIsMoving();
+
+        // path(std::deque<Waypoint>)
+        /*
+        [
+            {
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "radius": 0.0
+            }
+        ]
+        */
+        std::vector<json> pathList;
+        for (Waypoint waypoint : agent->getFullPath())
+        {
+            json waypointJson;
+            waypointJson["position"] = {
+                waypoint.position.x,
+                waypoint.position.y
+            };
+            waypointJson["radius"] = waypoint.radius;
+            pathList.push_back(waypointJson);
+        }
+        agentJson["path"] = pathList;
+
+        // radius(float)
+        agentJson["radius"] = agent->getRadius();
+
+        // impatient(float)
+        agentJson["impatient"] = agent->getImpatient();
+
+        // stopAtCorridor(float)
+        agentJson["stopAtCorridor"] = agent->getStopAtCorridor();
+
+        agentList.push_back(agentJson);
+
+    }
+
+    j["agvs"] = agvList;
+    j["agents"] = agentList;
+
+    return j;
+    
+}
+
+// write state
+void Utility::writeState(const char *fileName, std::vector<json> stateList)
+{
+    ofstream output(fileName, ios::app);
+    output << "[" << endl;
+    for (json j : stateList)
+    {
+        output << j.dump(4) << endl;
+        if (&j != &stateList.back())
+        {
+            output << "," << endl;
+        }
+    }
+    output << "]" << endl;
+    output.close();
+}
+
+
 // calculate number of people in each flow
 std::vector<int> Utility::getNumPedesInFlow(int junctionType,
                                             int totalPedestrian)

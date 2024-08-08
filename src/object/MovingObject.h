@@ -39,6 +39,9 @@ public:
 
     Point3f getPath();
 
+    // additional function to get the path: get full path
+    std::deque<Waypoint> getFullPath() const { return path; }
+
     void setPath(float x, float y, float radius);
 
     Point3f getDestination() const { return destination; };

@@ -694,6 +694,8 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos)
     }
 }
 
+std::vector<json> Simulator_State_Stream;
+
 // Update function to update the scene(to be called continuously to move the agents and AGVs)
 void update()
 {
@@ -708,6 +710,10 @@ void update()
 
     std::vector<Agent *> agents = socialForce->getCrowd();
     string run_time = convertTime((currTime - startTime)*(1000/timeRatio));
+
+    json current_State = Utility::SaveState(socialForce->getAGVs(), agents, currTime);
+    Simulator_State_Stream.push_back(current_State);
+
     for (Agent *agent : agents)
     {
         Point3f src = agent->getPosition();
@@ -838,6 +844,7 @@ void update()
                 (int)inputData["noRunPerHallway"]["value"],
                 totalRunningTime,
                 timeRatio);
+            Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
             exit(0); // Terminate program
         }
         
@@ -854,6 +861,8 @@ void update()
         std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
         delete socialForce;
         socialForce = 0;
+
+        Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
 
         exit(0); // Terminate program
     }
