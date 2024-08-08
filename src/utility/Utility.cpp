@@ -353,8 +353,67 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
     {
         json agvJson;
         agvJson["id"] = agv->getId();
-        agvJson["position"] = {agv->getPosition().x, agv->getPosition().y};
-        agvJson["direction"] = {agv->getDirection().x, agv->getDirection().y};
+        
+        // position
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agvJson["position"] = {
+            agv->getPosition().x,
+            agv->getPosition().y
+        };
+
+        // velocity(Vector3f)
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agvJson["velocity"] = {
+            agv->getVelocity().x,
+            agv->getVelocity().y
+        };
+
+        // direction(Vector3f)
+        /*
+        {
+            "x": 0.0,
+            "y": 0.0
+        }
+        */
+        agvJson["direction"] = {
+            agv->getDirection().x,
+            agv->getDirection().y
+        };
+
+        // travelingTime(int)
+        agvJson["travelingTime"] = agv->getTravelingTime();
+
+        // Width(float) and Length(float)
+        agvJson["Width & Length"] = {
+            agv->getWidth(),
+            agv->getLength()
+        };
+
+        // acceleration(float)
+        agvJson["acceleration"] = agv->getAcceleration();
+
+        // numOfCollision(int)
+        agvJson["numOfCollision"] = agv->getNumOfCollision();
+
+        // thresholdDisToPedes(float)
+        agvJson["thresholdDisToPedes"] = agv->getThresholdDisToPedes();
+
+        // totalStopTime(int)
+        agvJson["totalStopTime"] = agv->getTotalStopTime();
+
+        // collisionStartTime(int)
+        agvJson["collisionStartTime"] = agv->getCollisionStartTime();
+
         agvList.push_back(agvJson);
     }
 
