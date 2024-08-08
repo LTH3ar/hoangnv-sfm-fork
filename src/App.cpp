@@ -31,6 +31,8 @@ bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
 
 json inputData;
+json previousEventData;
+int eventType = 0;
 int timeRatio = 1;
 int runMode = 1;
 int graphicsMode = 1;
@@ -56,6 +58,7 @@ void init();
 void createWalls();
 
 void createAgents();
+void createAgentsPastEvent(int time, std::vector<Agent *> agents);
 
 void createAGVs();
 
@@ -74,11 +77,16 @@ int main(int argc, char **argv)
     // mapData = Utility::readMapData("data/map.txt");
     inputData = Utility::readInputData(argv[1]);
     mapData = Utility::readMapData(argv[2]);
+    previousEventData = Utility::readInputData(argv[3]);
 
     // this value is used to determine whether the simulation run a new event or repurpose the previous one
     if (argc > 3)
     {
-        int eventType = (int)argv[3]; // if eventype = null, then run a new event else repurpose the previous one
+        // if eventype = null, then run a new event else repurpose the previous one
+        if (argv[2] != "null")
+        {
+            eventType = 1;
+        }
     }
     
 
@@ -441,6 +449,9 @@ void createAgents()
         }
     }
 }
+
+// alternate function to create agents from the previous event
+
 
 void createAGVs()
 {
