@@ -75,6 +75,13 @@ int main(int argc, char **argv)
     inputData = Utility::readInputData(argv[1]);
     mapData = Utility::readMapData(argv[2]);
 
+    // this value is used to determine whether the simulation run a new event or repurpose the previous one
+    if (argc > 3)
+    {
+        int eventType = (int)argv[3]; // if eventype = null, then run a new event else repurpose the previous one
+    }
+    
+
     GlobalConfig::loadConfig();
     timeRatio = GlobalConfig::getTimeRatio();
     runMode = GlobalConfig::getRunMode();
