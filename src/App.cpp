@@ -72,7 +72,6 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos);
 
 void update();
 
-json event_data_tmp;
 int main(int argc, char **argv)
 {
     // inputData = Utility::readInputData("data/input.json");
@@ -83,8 +82,6 @@ int main(int argc, char **argv)
     
     //convert argv[3] to int
     eventTime = atoi(argv[3]);
-
-    event_data_tmp = getEventData(eventTime);
 
     GlobalConfig::loadConfig();
     timeRatio = GlobalConfig::getTimeRatio();
@@ -208,7 +205,13 @@ void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *
         createAgents();
         createAGVs();
 
-        // set the previous event data
+        // get the previous event data
+        previousEventData = getEventData(eventTime);
+
+        // set the current event data using the update function as reference
+        // update the current event data from the previous event data
+
+
 
     }
 }
@@ -760,14 +763,14 @@ void update()
 
     int count_agents = 0, count_agvs = 0;
 
-    std::vector<Agent *> agents = socialForce->getCrowd();
+    //std::vector<Agent *> agents = socialForce->getCrowd();
     string run_time = convertTime((currTime - startTime)*(1000/timeRatio));
 
     // History of the simulation
     json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), currTime*(1000/timeRatio));
     Simulator_State_Stream.push_back(current_State);
 
-    for (Agent *agent : agents)
+    for (Agent *agent : socialForce->getCrowd())
     {
         Point3f src = agent->getPosition();
         Point3f des = agent->getDestination();
@@ -811,8 +814,8 @@ void update()
         }
     }
 
-    std::vector<AGV *> agvs = socialForce->getAGVs();
-    for (AGV *agv : agvs)
+    // std::vector<AGV *> agvs = socialForce->getAGVs();
+    for (AGV *agv : socialForce->getAGVs())
     {
         if (agv->getCollisionStartTime() == 0 && agv->getVelocity().length() < speedConsiderAsStop && agv->getIsMoving())
         {
@@ -870,7 +873,7 @@ void update()
                     }
                     socialForce->removeWalls();
                     float hallwayLength = juncDataList[juncIndex].items().begin().value();
-                    if (numAGVCompleted + 1 <= agvs.size())
+                    if (numAGVCompleted + 1 <= socialForce->getAGVs().size())
                     {
                         cout << "*****=> " << juncDataList[juncIndex].items().begin().key() << ": " << hallwayLength << endl;
                     }
@@ -883,7 +886,7 @@ void update()
             count_agvs = count_agvs + 1;
         }
     }
-    if (count_agvs == agvs.size())
+    if (count_agvs == socialForce->getAGVs().size())
     {
         int totalRunningTime = currTime - startTime;
 
@@ -902,7 +905,7 @@ void update()
         // }
         
         Utility::writeResult(
-            "data/end.txt", juncName, graphicsMode, agvs,
+            "data/end.txt", juncName, graphicsMode, socialForce->getAGVs(),
             juncDataList,
             (int)inputData["runConcurrently"]["value"],
             runMode,
@@ -914,9 +917,6 @@ void update()
         std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
         delete socialForce;
         socialForce = 0;
-
-        // print event data in event_data
-        cout << event_data_tmp["event_time"] << endl;
 
         Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
         
