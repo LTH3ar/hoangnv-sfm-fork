@@ -549,7 +549,7 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
     std::vector<json> stateListTemp;
     for (json &state : stateList)
     {
-        if (state["event_time"] > threshold)
+        if (state["event_time"] >= threshold || state["event_time"] == 0)
         {
             stateListTemp.push_back(state);
             threshold = threshold + 1000;
@@ -561,6 +561,14 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
     j["timeline"] = stateListTemp;
     output << j.dump(4) << endl;
     output.close();
+
+    // debug output
+    ofstream debugOutput("data/debug.json", ios::app);
+    json debug;
+    debug["timeline"] = stateList;
+    debugOutput << debug.dump(4) << endl;
+    debugOutput.close();
+
     // clean up data
     stateList.clear();
     stateListTemp.clear();

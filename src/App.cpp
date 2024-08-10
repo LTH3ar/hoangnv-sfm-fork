@@ -24,15 +24,18 @@ GLsizei winWidth = 1080; // Window width (16:10 ratio)
 GLsizei winHeight = 660; // Window height (16:10 ratio)
 SocialForce *socialForce;
 float fps = 0; // Frames per second
+int internalCounter = 0;
 int currTime = 0;
 int startTime = 0;
 int predictedTime = 0;
 bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
+json timeline_queue;
 
 json inputData;
 json previousEventData;
 int eventTime = 0;
+std::vector<json> Simulator_State_Stream;
 int timeRatio = 1;
 int runMode = 1;
 int graphicsMode = 1;
@@ -54,12 +57,11 @@ int threshold = 0;
 
 // Function Prototypes
 void init();
-
+json getEventData(int eventTime);
 void createWalls();
 
 void createAgents();
-void createAgentsPastEvent(int time, std::vector<Agent *> agents);
-
+void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *> agvs);
 void createAGVs();
 
 void display();
@@ -70,14 +72,19 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos);
 
 void update();
 
-
+json event_data_tmp;
 int main(int argc, char **argv)
 {
     // inputData = Utility::readInputData("data/input.json");
     // mapData = Utility::readMapData("data/map.txt");
     inputData = Utility::readInputData(argv[1]);
     mapData = Utility::readMapData(argv[2]);
-    eventTime = (int)argv[3]; //seconds
+    timeline_queue = Utility::readInputData("data/tmp/state.json");
+    
+    //convert argv[3] to int
+    eventTime = atoi(argv[3]);
+
+    event_data_tmp = getEventData(eventTime);
 
     GlobalConfig::loadConfig();
     timeRatio = GlobalConfig::getTimeRatio();
@@ -173,12 +180,52 @@ void init()
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);
 
-    srand(1604010629); // Seed to generate random numbers
-
+    //srand(1604010629); // Seed to generate random numbers
+    //srand(1);
     socialForce = new SocialForce;
     createWalls();
     createAgents();
     createAGVs();
+
+    // add to state list
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), currTime*(1000/timeRatio));
+    Simulator_State_Stream.push_back(current_State);
+}
+
+void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *> agvs)
+{
+    if (eventTime == 0)
+    {
+        socialForce = new SocialForce;
+        createWalls();
+        createAgents();
+        createAGVs();
+    }
+    else
+    {
+        socialForce = new SocialForce;
+        createWalls();
+        createAgents();
+        createAGVs();
+
+        // set the previous event data
+
+    }
+}
+
+json getEventData(int eventTime)
+{
+    json eventData;
+    for (json event : timeline_queue["timeline"])
+    {
+        // both ['timeline']['event_time'] and eventTime must be converted to interger after 
+        if ((int)(event["event_time"].get<int>()/1000) == eventTime)
+        {
+            eventData = event;
+            break;
+        }
+    }
+    return eventData;
 }
 
 void createWalls()
@@ -701,8 +748,6 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos)
     }
 }
 
-std::vector<json> Simulator_State_Stream;
-
 // Update function to update the scene(to be called continuously to move the agents and AGVs)
 void update()
 {
@@ -719,7 +764,7 @@ void update()
     string run_time = convertTime((currTime - startTime)*(1000/timeRatio));
 
     // History of the simulation
-    json current_State = Utility::SaveState(socialForce->getAGVs(), agents, currTime*(1000/timeRatio));
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), currTime*(1000/timeRatio));
     Simulator_State_Stream.push_back(current_State);
 
     for (Agent *agent : agents)
@@ -870,8 +915,11 @@ void update()
         delete socialForce;
         socialForce = 0;
 
-        Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
+        // print event data in event_data
+        cout << event_data_tmp["event_time"] << endl;
 
+        Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
+        
         exit(0); // Terminate program
     }
 
@@ -885,5 +933,7 @@ void update()
     computeFPS(&fps);
     glutPostRedisplay();
     glutIdleFunc(update); // Continuously execute 'update()'
+    internalCounter++;
+    cout << "Internal Counter: " << internalCounter << endl;
 }
 // tích hợp hành vi người đi bộ vào phần mêm mô phỏng thuật toán định tuyến AGV
