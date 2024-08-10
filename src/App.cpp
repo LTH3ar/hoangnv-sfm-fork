@@ -32,7 +32,7 @@ float speedConsiderAsStop = 0.2;
 
 json inputData;
 json previousEventData;
-int eventType = 0;
+int eventTime = 0;
 int timeRatio = 1;
 int runMode = 1;
 int graphicsMode = 1;
@@ -77,18 +77,7 @@ int main(int argc, char **argv)
     // mapData = Utility::readMapData("data/map.txt");
     inputData = Utility::readInputData(argv[1]);
     mapData = Utility::readMapData(argv[2]);
-    previousEventData = Utility::readInputData(argv[3]);
-
-    // this value is used to determine whether the simulation run a new event or repurpose the previous one
-    if (argc > 3)
-    {
-        // if eventype = null, then run a new event else repurpose the previous one
-        if (argv[2] != "null")
-        {
-            eventType = 1;
-        }
-    }
-    
+    eventTime = (int)argv[3]; //seconds
 
     GlobalConfig::loadConfig();
     timeRatio = GlobalConfig::getTimeRatio();
@@ -729,7 +718,8 @@ void update()
     std::vector<Agent *> agents = socialForce->getCrowd();
     string run_time = convertTime((currTime - startTime)*(1000/timeRatio));
 
-    json current_State = Utility::SaveState(socialForce->getAGVs(), agents, currTime);
+    // History of the simulation
+    json current_State = Utility::SaveState(socialForce->getAGVs(), agents, currTime*(1000/timeRatio));
     Simulator_State_Stream.push_back(current_State);
 
     for (Agent *agent : agents)
@@ -852,19 +842,19 @@ void update()
     {
         int totalRunningTime = currTime - startTime;
 
-        if (currTime >= predictedTime){
-            cout << "Time out" << endl;
-            Utility::writeResult(
-                "data/end.txt", juncName, graphicsMode, agvs,
-                juncDataList,
-                (int)inputData["runConcurrently"]["value"],
-                runMode,
-                (int)inputData["noRunPerHallway"]["value"],
-                totalRunningTime,
-                timeRatio);
-            Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
-            exit(0); // Terminate program
-        }
+        // if (currTime >= predictedTime){
+        //     cout << "Time out" << endl;
+        //     Utility::writeResult(
+        //         "data/end.txt", juncName, graphicsMode, agvs,
+        //         juncDataList,
+        //         (int)inputData["runConcurrently"]["value"],
+        //         runMode,
+        //         (int)inputData["noRunPerHallway"]["value"],
+        //         totalRunningTime,
+        //         timeRatio);
+        //     Utility::writeState("data/tmp/state.json", Simulator_State_Stream);
+        //     exit(0); // Terminate program
+        // }
         
         Utility::writeResult(
             "data/end.txt", juncName, graphicsMode, agvs,

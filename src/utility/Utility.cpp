@@ -347,7 +347,7 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
     ]
     */
     json j;
-    j["time"] = time;
+    j["event_time"] = time;
     std::vector<json> agvList;
     for (AGV *agv : agvs)
     {
@@ -544,20 +544,26 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
     ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
     ofs.close();
 
-    ofstream output(fileName, ios::app);
-    output << "[" << endl;
-    int counter = 0;
-    for (json j : stateList)
+    // remove some event_time only take event_time by second instead of by millisecond
+    int threshold = 1000;
+    std::vector<json> stateListTemp;
+    for (json &state : stateList)
     {
-        output << j.dump(4) << endl;
-        if (counter < stateList.size() - 1)
+        if (state["event_time"] > threshold)
         {
-            output << "," << endl;
+            stateListTemp.push_back(state);
+            threshold = threshold + 1000;
         }
-        counter++;
     }
-    output << "]" << endl;
+
+    ofstream output(fileName, ios::app);
+    json j;
+    j["timeline"] = stateListTemp;
+    output << j.dump(4) << endl;
     output.close();
+    // clean up data
+    stateList.clear();
+    stateListTemp.clear();
 }
 
 
