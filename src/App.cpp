@@ -63,7 +63,10 @@ void createWalls();
 void createAgents();
 void createAgentAlt(json agents);
 void event_handler(int eventTime);
-void createAGVs();
+void createAGVs(json agvs);
+void createAGVsAlt(json agvs);
+void setAgentsFlow(Agent *agent, float desiredSpeed, float maxSpeed, float minSpeed, int caseJump);
+void setAgentsFlowAlt(Agent *agent, json agent_data);
 
 void display();
 
@@ -199,7 +202,7 @@ void event_handler(int eventTime)
         socialForce = new SocialForce;
         createWalls();
         createAgents();
-        createAGVs();
+        createAGVs(NULL);
     }
     else
     {
@@ -208,52 +211,28 @@ void event_handler(int eventTime)
         socialForce = new SocialForce;
         createWalls();
         createAgentAlt(previousEventData["agents"]);
-        createAGVs();
+        createAGVsAlt(previousEventData["agvs"]);
 
-        
-
-        // set the current event data using the update function as reference
-        // update the current event data from the previous event data
-        //agent
-        // for (Agent *agent : socialForce->getCrowd())
+        //agv
+        // for (AGV *agv : socialForce->getAGVs())
         // {
-        //     for (json::iterator it = previousEventData["agents"].begin(); it != previousEventData["agents"].end(); ++it)
+        //     for (json::iterator it = previousEventData["agvs"].begin(); it != previousEventData["agvs"].end(); ++it)
         //     {
-        //         if (agent->getId() == it.value()["id"])
+        //         if (agv->getId() == it.value()["id"])
         //         {
-        //             agent->setDesiredSpeed(it.value()["desiredSpeed"]);
-        //             //cout << "Desired speed: " << it.value()["desiredSpeed"] << endl;
-        //             //agent->setStopAtCorridor(it.value()["stopAtCorridor"]);
-        //             agent->setPath((float)it.value()["path"][0]["position"][0], (float)it.value()["path"][0]["position"][1], (float)it.value()["path"][0]["radius"]);
-        //             //cout << "Path: " << it.value()["path"][0]["position"][0] << " - " << it.value()["path"][0]["position"][1] << " - " << it.value()["path"][0]["radius"] << endl;
-        //             agent->setDestination(it.value()["destination"][0], it.value()["destination"][1]);
-        //             //cout << "Destination: " << it.value()["destination"][0] << " - " << it.value()["destination"][1] << endl;
-        //             agent->setColor(it.value()["color"][0], it.value()["color"][1], it.value()["color"][2]);
-        //             //cout << "Color: " << it.value()["color"][0] << " - " << it.value()["color"][1] << " - " << it.value()["color"][2] << endl;
+        //             // agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]); //default value global
+        //             // cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"] << endl;
+        //             agv->setThresholdDisToPedes((float)it.value()["thresholdDisToPedes"]);
+        //             cout << "Threshold distance: " << it.value()["thresholdDisToPedes"] << endl;
+        //             agv->setAcceleration((float)it.value()["acceleration"]);
+        //             cout << "Acceleration: " << it.value()["acceleration"] << endl;
+        //             agv->setDirection(it.value()["direction"][0], it.value()["direction"][1]);
+        //             cout << "Direction: " << it.value()["direction"][0] << " - " << it.value()["direction"][1] << endl;
+        //             agv->setPosition((float)it.value()["position"][0], (float)it.value()["position"][1]);
+        //             cout << "Position: " << it.value()["position"][0] << " - " << it.value()["position"][1] << endl;
         //         }
         //     }
         // }
-
-        //agv
-        for (AGV *agv : socialForce->getAGVs())
-        {
-            for (json::iterator it = previousEventData["agvs"].begin(); it != previousEventData["agvs"].end(); ++it)
-            {
-                if (agv->getId() == it.value()["id"])
-                {
-                    // agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]); //default value global
-                    // cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"] << endl;
-                    agv->setThresholdDisToPedes((float)it.value()["thresholdDisToPedes"]);
-                    cout << "Threshold distance: " << it.value()["thresholdDisToPedes"] << endl;
-                    agv->setAcceleration((float)it.value()["acceleration"]);
-                    cout << "Acceleration: " << it.value()["acceleration"] << endl;
-                    agv->setDirection(it.value()["direction"][0], it.value()["direction"][1]);
-                    cout << "Direction: " << it.value()["direction"][0] << " - " << it.value()["direction"][1] << endl;
-                    agv->setPosition((float)it.value()["position"][0], (float)it.value()["position"][1]);
-                    cout << "Position: " << it.value()["position"][0] << " - " << it.value()["position"][1] << endl;
-                }
-            }
-        }
     }
 }
 
@@ -559,40 +538,10 @@ void createAgentAlt(json agents)
 // alternate function to create agents from the previous event
 
 
-void createAGVs()
+void createAGVs(json agvs)
 {
     AGV *agv = NULL;
     vector<int> array;
-
-    // test
-    // agv = new AGV();
-    // vector<Point3f> route = Utility::getRouteAGV(juncData.size(), 0, 2, walkwayWidth, juncData);
-    // agv->setDirection(0, 2);
-    // agv->setPosition(route[0].x, route[0].y);
-
-    // for (Agent *agent : socialForce->getCrowd())
-    // {
-    //     if (agent->getPosition().distance(agv->getPosition()) < 0.5F)
-    //     {
-    //         do
-    //         {
-    //             agent->setPosition(agent->getPosition().x - 0.1F, agent->getPosition().y - 0.1F);
-    //         } while (agent->getPosition().distance(agv->getPosition()) < 0.5F);
-    //     }
-    // }
-
-    // agv->setDestination(route[route.size() - 1].x, route[route.size() - 1].y);
-    // agv->setDesiredSpeed(0.6F);
-    // agv->setAcceleration(inputData[9]);
-    // agv->setDistance((float)inputData[10]);
-    // for (int i = 1; i < route.size(); i++)
-    // {
-    //     agv->setPath(route[i].x, route[i].y, 1.0);
-    //     std::cout << route[i] << endl;
-    // }
-    // socialForce->addAGV(agv);
-
-    // test
     
     int numOfHallway = juncDataList.size();
     int numRunPerHallway = (int)inputData["noRunPerHallway"]["value"];
@@ -754,11 +703,193 @@ void createAGVs()
             }
 
         }
-        
-    
-    
     
     }
+}
+
+void createAGVsAlt(json agvs)
+{
+    AGV *agv = NULL;
+
+    // this part need to be deleted sometime later but for now put it here to test
+    int numOfHallway = juncDataList.size();
+    int numRunPerHallway = (int)inputData["noRunPerHallway"]["value"];
+    int juncIndexTemp = 0;
+    float hallwayLength = juncDataList[juncIndexTemp].items().begin().value();
+    // cout << "*****=> " << juncDataList[juncIndex].items().begin().key() << ": " << hallwayLength << endl;
+    float length1Side = (hallwayLength) / 2;
+    vector<float> juncDataTemp = {length1Side, length1Side};
+    int numAGVPerRun = 1;
+    int agvDirection = 0; // Opposite direction
+    if ((int)inputData["runConcurrently"]["value"] == 1)
+    {
+        numAGVPerRun = 2;
+    }
+    // std::cout << int(inputData["runDirection"]["value"]) << endl;
+    if (int(inputData["runDirection"]["value"]) == 1)
+    {
+        agvDirection = 1; // Same direction
+    }
+        
+    if (agvDirection == 0){
+    
+        for (int j = 0; j < agvs.size()+1; j++)
+        {
+            // std::cout << "AGV: " << j << endl;
+            agv = new AGV();
+            vector<Point3f> route = Utility::getRouteAGV(j, 1, walkwayWidth, juncDataTemp); // Just need the source
+            agv->setDirection(j, 1);
+            // std::cout << "Direction: " << j << " - 1" << endl;
+            // std::cout << "Route: " << route[0] << endl;
+            agv->setPosition(route[0].x, route[0].y);
+
+            agv->setDestination(route[route.size() - 1].x, route[route.size() - 1].y);
+            // std::cout << "Destination: " << route[route.size() - 1] << endl;
+
+            agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]["value"]);
+            // std::cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"]["value"] << endl;
+            
+            agv->setAcceleration(inputData["acceleration"]["value"]);
+            // std::cout << "Acceleration: " << inputData["acceleration"]["value"] << endl;
+
+            agv->setThresholdDisToPedes((float)inputData["thresDistance"]["value"]);
+            // std::cout << "Threshold distance: " << (float)inputData["thresDistance"]["value"] << endl;
+
+            for (int i = 1; i < route.size(); i++)
+            {
+                agv->setPath(route[i].x, route[i].y, 1.0);
+                // std::cout << "Path: " << route[i] << endl;
+            }
+            socialForce->addAGV(agv);
+
+            int marker = (agvs.size()+1) * (juncIndexTemp + 1) - 1;
+            if ((int)inputData["runConcurrently"]["value"] == 1)
+            {
+                marker = (agvs.size()+1) * 2 * (juncIndexTemp + 1) - 1;
+                // std::cout << "Marker: " << marker << endl;
+            }
+            // std::cout << "AGV ID: " << agv->getId() << endl;
+            if (agv->getId() == marker)
+            {
+                juncIndexTemp = juncIndexTemp + 1;
+                // std::cout << "Junction index: " << juncIndexTemp << endl;
+
+                if (juncIndexTemp == juncDataList.size())
+                {
+                    juncIndexTemp = 0;
+                    // std::cout << "Junction index: " << juncIndexTemp << endl;
+                }
+                hallwayLength = juncDataList[juncIndexTemp].items().begin().value();
+                // std::cout << "*****=> " << juncDataList[juncIndexTemp].items().begin().key() << ": " << hallwayLength << endl;
+                length1Side = (hallwayLength) / 2;
+                // std::cout << "Length 1 side: " << length1Side << endl;
+                juncDataTemp = {length1Side, length1Side};
+                // std::cout << "Junction data: " << juncDataTemp[0] << " - " << juncDataTemp[1] << endl;
+            }
+            // std::cout << "====================================" << endl << endl;
+        }
+    
+    }
+        
+    else {
+
+        for (int j = 0; j < numAGVPerRun; j++)
+        {
+            // std::cout << "AGV: " << j << endl;
+            agv = new AGV();
+            
+            if (j == 0){
+                vector<Point3f> route = Utility::getRouteAGV(j, 1, walkwayWidth, juncDataTemp); // Just need the source
+                agv->setDirection(j, 1);
+                // std::cout << "Direction: " << j << " - 1" << endl;
+                // std::cout << "Route: " << route[0] << endl;
+                agv->setPosition(route[0].x, route[0].y);
+
+                agv->setDestination(route[route.size() - 1].x, route[route.size() - 1].y);
+                // std::cout << "Destination: " << route[route.size() - 1] << endl;
+                for (int i = 1; i < route.size(); i++)
+                {
+                    agv->setPath(route[i].x, route[i].y, 1.0);
+                    // std::cout << "Path: " << route[i] << endl;
+                }
+            }
+            else {
+                vector<Point3f> route = Utility::getRouteAGV(j, 1, walkwayWidth, juncDataTemp); // Just need the source
+                agv->setDirection(0, 1);
+                // std::cout << "Direction: " << 0 << " - 1" << endl;
+                // std::cout << "Route: " << route[0] << endl;
+                agv->setPosition(-route[0].x, -route[0].y);
+
+                agv->setDestination(-route[route.size() - 1].x, -route[route.size() - 1].y);
+                // std::cout << "Destination: " << route[route.size() - 1] << endl;
+                for (int i = 1; i < route.size(); i++)
+                {
+                    agv->setPath(-route[i].x, -route[i].y, 1.0);
+                    // std::cout << "Path: " << route[i] << endl;
+                }
+            }
+
+            agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]["value"]);
+            // std::cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"]["value"] << endl;
+            
+            agv->setAcceleration(inputData["acceleration"]["value"]);
+            // std::cout << "Acceleration: " << inputData["acceleration"]["value"] << endl;
+
+            agv->setThresholdDisToPedes((float)inputData["thresDistance"]["value"]);
+            // std::cout << "Threshold distance: " << (float)inputData["thresDistance"]["value"] << endl;
+
+            
+            socialForce->addAGV(agv);
+
+            int marker = (agvs.size()+1) * (juncIndexTemp + 1) - 1;
+            if ((int)inputData["runConcurrently"]["value"] == 1)
+            {
+                marker = (agvs.size()+1) * 2 * (juncIndexTemp + 1) - 1;
+                // std::cout << "Marker: " << marker << endl;
+            }
+            // std::cout << "AGV ID: " << agv->getId() << endl;
+            if (agv->getId() == marker)
+            {
+                juncIndexTemp = juncIndexTemp + 1;
+                // std::cout << "Junction index: " << juncIndexTemp << endl;
+
+                if (juncIndexTemp == juncDataList.size())
+                {
+                    juncIndexTemp = 0;
+                    // std::cout << "Junction index: " << juncIndexTemp << endl;
+                }
+                hallwayLength = juncDataList[juncIndexTemp].items().begin().value();
+                // std::cout << "*****=> " << juncDataList[juncIndexTemp].items().begin().key() << ": " << hallwayLength << endl;
+                length1Side = (hallwayLength) / 2;
+                // std::cout << "Length 1 side: " << length1Side << endl;
+                juncDataTemp = {length1Side, length1Side};
+                // std::cout << "Junction data: " << juncDataTemp[0] << " - " << juncDataTemp[1] << endl;
+            }
+            // std::cout << "====================================" << endl << endl;
+        }
+
+    }
+
+    for (AGV *agv : socialForce->getAGVs())
+        {
+            for (json::iterator it = agvs.begin(); it != agvs.end(); ++it)
+            {
+                if (agv->getId() == it.value()["id"])
+                {
+                    // agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]); //default value global
+                    // cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"] << endl;
+                    agv->setThresholdDisToPedes((float)it.value()["thresholdDisToPedes"]);
+                    cout << "Threshold distance: " << it.value()["thresholdDisToPedes"] << endl;
+                    agv->setAcceleration((float)it.value()["acceleration"]);
+                    cout << "Acceleration: " << it.value()["acceleration"] << endl;
+                    agv->setDirection(it.value()["direction"][0], it.value()["direction"][1]);
+                    cout << "Direction: " << it.value()["direction"][0] << " - " << it.value()["direction"][1] << endl;
+                    agv->setPosition((float)it.value()["position"][0], (float)it.value()["position"][1]);
+                    cout << "Position: " << it.value()["position"][0] << " - " << it.value()["position"][1] << endl;
+                }
+            }
+        }
+    
 }
 
 void display()

@@ -562,12 +562,12 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
     output << j.dump(4) << endl;
     output.close();
 
-    // debug output
-    ofstream debugOutput("data/debug.json", ios::app);
-    json debug;
-    debug["timeline"] = stateList;
-    debugOutput << debug.dump(4) << endl;
-    debugOutput.close();
+    // // debug output
+    // ofstream debugOutput("data/debug.json", ios::app);
+    // json debug;
+    // debug["timeline"] = stateList;
+    // debugOutput << debug.dump(4) << endl;
+    // debugOutput.close();
 
     // clean up data
     stateList.clear();
