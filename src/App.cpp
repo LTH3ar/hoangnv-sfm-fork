@@ -61,7 +61,8 @@ json getEventData(int eventTime);
 void createWalls();
 
 void createAgents();
-void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *> agvs);
+void createAgentAlt(json agents);
+void event_handler(int eventTime);
 void createAGVs();
 
 void display();
@@ -94,8 +95,8 @@ int main(int argc, char **argv)
     juncDataList = Utility::convertMapData(mapData);
     float hallwayLength = juncDataList[juncIndex].items().begin().value();
 
-    cout << "Hallway length: " << hallwayLength << endl;
-    cout << "desired speed: " << inputData["agvDesiredSpeed"]["value"] << endl;
+    // cout << "Hallway length: " << hallwayLength << endl;
+    // cout << "desired speed: " << inputData["agvDesiredSpeed"]["value"] << endl;
 
     walkwayWidth = (float)inputData["hallwayWidth"]["value"];
     float length1Side = (hallwayLength) / 2;
@@ -179,17 +180,19 @@ void init()
 
     //srand(1604010629); // Seed to generate random numbers
     //srand(1);
-    socialForce = new SocialForce;
-    createWalls();
-    createAgents();
-    createAGVs();
+    // socialForce = new SocialForce;
+    // createWalls();
+    // createAgents();
+    // createAGVs();
+
+    event_handler(eventTime);
 
     // add to state list
     json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), currTime*(1000/timeRatio));
     Simulator_State_Stream.push_back(current_State);
 }
 
-void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *> agvs)
+void event_handler(int eventTime)
 {
     if (eventTime == 0)
     {
@@ -200,19 +203,57 @@ void event_handler(int eventTime, std::vector<Agent *> agents, std::vector<AGV *
     }
     else
     {
-        socialForce = new SocialForce;
-        createWalls();
-        createAgents();
-        createAGVs();
-
         // get the previous event data
         previousEventData = getEventData(eventTime);
+        socialForce = new SocialForce;
+        createWalls();
+        createAgentAlt(previousEventData["agents"]);
+        createAGVs();
+
+        
 
         // set the current event data using the update function as reference
         // update the current event data from the previous event data
+        //agent
+        // for (Agent *agent : socialForce->getCrowd())
+        // {
+        //     for (json::iterator it = previousEventData["agents"].begin(); it != previousEventData["agents"].end(); ++it)
+        //     {
+        //         if (agent->getId() == it.value()["id"])
+        //         {
+        //             agent->setDesiredSpeed(it.value()["desiredSpeed"]);
+        //             //cout << "Desired speed: " << it.value()["desiredSpeed"] << endl;
+        //             //agent->setStopAtCorridor(it.value()["stopAtCorridor"]);
+        //             agent->setPath((float)it.value()["path"][0]["position"][0], (float)it.value()["path"][0]["position"][1], (float)it.value()["path"][0]["radius"]);
+        //             //cout << "Path: " << it.value()["path"][0]["position"][0] << " - " << it.value()["path"][0]["position"][1] << " - " << it.value()["path"][0]["radius"] << endl;
+        //             agent->setDestination(it.value()["destination"][0], it.value()["destination"][1]);
+        //             //cout << "Destination: " << it.value()["destination"][0] << " - " << it.value()["destination"][1] << endl;
+        //             agent->setColor(it.value()["color"][0], it.value()["color"][1], it.value()["color"][2]);
+        //             //cout << "Color: " << it.value()["color"][0] << " - " << it.value()["color"][1] << " - " << it.value()["color"][2] << endl;
+        //         }
+        //     }
+        // }
 
-
-
+        //agv
+        for (AGV *agv : socialForce->getAGVs())
+        {
+            for (json::iterator it = previousEventData["agvs"].begin(); it != previousEventData["agvs"].end(); ++it)
+            {
+                if (agv->getId() == it.value()["id"])
+                {
+                    // agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]); //default value global
+                    // cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"] << endl;
+                    agv->setThresholdDisToPedes((float)it.value()["thresholdDisToPedes"]);
+                    cout << "Threshold distance: " << it.value()["thresholdDisToPedes"] << endl;
+                    agv->setAcceleration((float)it.value()["acceleration"]);
+                    cout << "Acceleration: " << it.value()["acceleration"] << endl;
+                    agv->setDirection(it.value()["direction"][0], it.value()["direction"][1]);
+                    cout << "Direction: " << it.value()["direction"][0] << " - " << it.value()["direction"][1] << endl;
+                    agv->setPosition((float)it.value()["position"][0], (float)it.value()["position"][1]);
+                    cout << "Position: " << it.value()["position"][0] << " - " << it.value()["position"][1] << endl;
+                }
+            }
+        }
     }
 }
 
@@ -401,6 +442,18 @@ void setAgentsFlow(Agent *agent, float desiredSpeed, float maxSpeed, float minSp
     agent->setDesiredSpeed(desiredSpeed);
     std::vector<float> color = getPedesColor(maxSpeed, minSpeed, agent->getDesiredSpeed(), classificationType);
     agent->setColor(color[0], color[1], color[2]);
+    cout << "Color: " << color[0] << " - " << color[1] << " - " << color[2] << endl;
+    socialForce->addAgent(agent);
+}
+
+// alternate function to set agents from the previous event
+void setAgentsFlowAlt(Agent *agent, json agent_data)
+{
+    agent->setPosition(agent_data["position"][0], agent_data["position"][1]);
+    agent->setPath(agent_data["path"][0]["position"][0], agent_data["path"][0]["position"][1], agent_data["path"][0]["radius"]);
+    agent->setDestination(agent_data["destination"][0], agent_data["destination"][1]);
+    agent->setDesiredSpeed(agent_data["desiredSpeed"]);
+    agent->setColor(agent_data["color"][0], agent_data["color"][1], agent_data["color"][2]);
     socialForce->addAgent(agent);
 }
 
@@ -487,6 +540,20 @@ void createAgents()
             }
         }
     }
+}
+
+void createAgentAlt(json agents)
+{
+    Agent *agent;
+    // get the number of agents from previous event
+    int numOfPeople = agents.size();
+
+    for (int i = 0; i < numOfPeople; i++)
+    {
+        agent = new Agent;
+        setAgentsFlowAlt(agent, agents[i]);
+    }
+
 }
 
 // alternate function to create agents from the previous event

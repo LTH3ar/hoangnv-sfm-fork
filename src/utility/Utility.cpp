@@ -426,15 +426,15 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
         // color
         /*
         {
-            "red": 0.0,
+            "red": 0.0, need to be multiplied by 255
             "green": 0.0,
             "blue": 0.0
         }
         */
         agentJson["color"] = {
-            agent->getColor().x,
-            agent->getColor().y,
-            agent->getColor().z
+            agent->getColor().x*255,
+            agent->getColor().y*255,
+            agent->getColor().z*255
         };
 
         // position
