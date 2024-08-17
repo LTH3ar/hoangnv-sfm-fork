@@ -202,7 +202,7 @@ void event_handler(int eventTime)
         socialForce = new SocialForce;
         createWalls();
         createAgents();
-        createAGVs(NULL);
+        createAGVsAlt(NULL);
     }
     else
     {
@@ -212,27 +212,6 @@ void event_handler(int eventTime)
         createWalls();
         createAgentAlt(previousEventData["agents"]);
         createAGVsAlt(previousEventData["agvs"]);
-
-        //agv
-        // for (AGV *agv : socialForce->getAGVs())
-        // {
-        //     for (json::iterator it = previousEventData["agvs"].begin(); it != previousEventData["agvs"].end(); ++it)
-        //     {
-        //         if (agv->getId() == it.value()["id"])
-        //         {
-        //             // agv->setDesiredSpeed((float)inputData["agvDesiredSpeed"]); //default value global
-        //             // cout << "Desired speed: " << (float)inputData["agvDesiredSpeed"] << endl;
-        //             agv->setThresholdDisToPedes((float)it.value()["thresholdDisToPedes"]);
-        //             cout << "Threshold distance: " << it.value()["thresholdDisToPedes"] << endl;
-        //             agv->setAcceleration((float)it.value()["acceleration"]);
-        //             cout << "Acceleration: " << it.value()["acceleration"] << endl;
-        //             agv->setDirection(it.value()["direction"][0], it.value()["direction"][1]);
-        //             cout << "Direction: " << it.value()["direction"][0] << " - " << it.value()["direction"][1] << endl;
-        //             agv->setPosition((float)it.value()["position"][0], (float)it.value()["position"][1]);
-        //             cout << "Position: " << it.value()["position"][0] << " - " << it.value()["position"][1] << endl;
-        //         }
-        //     }
-        // }
     }
 }
 
@@ -421,7 +400,7 @@ void setAgentsFlow(Agent *agent, float desiredSpeed, float maxSpeed, float minSp
     agent->setDesiredSpeed(desiredSpeed);
     std::vector<float> color = getPedesColor(maxSpeed, minSpeed, agent->getDesiredSpeed(), classificationType);
     agent->setColor(color[0], color[1], color[2]);
-    cout << "Color: " << color[0] << " - " << color[1] << " - " << color[2] << endl;
+    //cout << "Color: " << color[0] << " - " << color[1] << " - " << color[2] << endl;
     socialForce->addAgent(agent);
 }
 
@@ -712,8 +691,6 @@ void createAGVsAlt(json agvs)
     AGV *agv = NULL;
 
     // this part need to be deleted sometime later but for now put it here to test
-    int numOfHallway = juncDataList.size();
-    int numRunPerHallway = (int)inputData["noRunPerHallway"]["value"];
     int juncIndexTemp = 0;
     float hallwayLength = juncDataList[juncIndexTemp].items().begin().value();
     // cout << "*****=> " << juncDataList[juncIndex].items().begin().key() << ": " << hallwayLength << endl;
@@ -870,7 +847,8 @@ void createAGVsAlt(json agvs)
 
     }
 
-    for (AGV *agv : socialForce->getAGVs())
+    if (agvs != NULL){
+        for (AGV *agv : socialForce->getAGVs())
         {
             for (json::iterator it = agvs.begin(); it != agvs.end(); ++it)
             {
@@ -889,7 +867,7 @@ void createAGVsAlt(json agvs)
                 }
             }
         }
-    
+    }
 }
 
 void display()
