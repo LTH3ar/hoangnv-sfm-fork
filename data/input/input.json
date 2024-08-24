@@ -1,11 +1,7 @@
 {
-  "noRunPerHallway": {
-    "description": "Number of times the AGV runs for each hallway",
-    "value": 1
-  },
   "numOfAgents": {
     "description": "Number of agents",
-    "value": 10
+    "value": 0
   },
   "TDDegree": {
     "description": "T-Distribution' degree of freedom",
@@ -65,19 +61,27 @@
   },
   "hallwayLength": {
     "description": "Hallway length",
-    "value": 30
+    "value": 60
   },
   "hallwayWidth": {
     "description": "Hallway width",
     "value": 6
   },
-  "runConcurrently": {
-    "description": "AGV run concurrently",
-    "value": 1
+  "agvDirections": {
+    "description": "Run direction of the AGV: left to right (0), right to left (1)",
+    "value": [1]
   },
-  "runDirection": {
-    "description": "AGV run direction (1 - same direction, 0 - opposite direction)",
-    "value": 1
+  "agvIDs": {
+    "description": "AGV ID",
+    "value": [3]
+  },
+  "timeline_pointer": {
+    "description": "Timeline pointer",
+    "value": 20
+  },
+  "hallwayID": {
+    "description": "Arc ID",
+    "value": "j0"
   },
   "experimentalDeviation": {
     "description": "Experimental deviation (percent)",

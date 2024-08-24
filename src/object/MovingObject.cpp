@@ -66,6 +66,10 @@ Point3f MovingObject::getAheadVector() const {
     return (velocity + position);
 }
 
+void MovingObject::setVelocity(float x, float y, float z) {
+    velocity.set(x, y, z);
+}
+
 float MovingObject::getOrientation() {
     return (atan2(velocity.y, velocity.x) * (180 / PI));
 }

@@ -7,8 +7,7 @@ int AGV::agvIdx = -1;
 AGV::AGV()
 {
     MovingObject();
-    id = ++agvIdx;
-
+    id = 0;
     setAgvSize(0.35F, 0.75F);
     travelingTime = 0;
     numOfCollision = 0;
@@ -17,17 +16,30 @@ AGV::AGV()
     velocity.set(0.0, 0.0, 0.0);
     collisionStartTime = 0;
     totalStopTime = 0;
+    generalDirection = 0;
+    reachDestination = false;
 }
 
 AGV::~AGV()
 {
-    agvIdx--;
+    // agvIdx--;
+}
+
+void AGV::setAgvIdx(int agvIdx)
+{
+    this->agvIdx = agvIdx;
+    this->id = agvIdx;
 }
 
 void AGV::setAgvSize(float width, float length)
 {
     this->width = width;
     this->length = length;
+}
+
+void AGV::setReachDestination(bool reachDestination)
+{
+    this->reachDestination = reachDestination;
 }
 
 void AGV::setTravelingTime(int travelingTime)
@@ -71,6 +83,11 @@ void AGV::setPoints(Point3f pointA, Point3f pointB, Point3f pointC, Point3f poin
 void AGV::setDirection(float x, float y)
 {
     this->direction.set(x, y, 0.0F);
+}
+
+void AGV::setGeneralDirection(int generalDirection)
+{
+    this->generalDirection = generalDirection;
 }
 
 Point3f AGV::getNearestPoint(Point3f positionAgent)

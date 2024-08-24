@@ -30,10 +30,9 @@ namespace Utility
     void writeResult(
         const char *fileName, std::string name, int mode, std::vector<AGV *> data,
         std::vector<json> juncDataList,
-        int agvRunConcurrently,
         int runMode,
-        int numRunPerHallway,
         int totalRunningTime,
+        string arcID,
         int timeRatio);
 
     json SaveState(
@@ -49,6 +48,17 @@ namespace Utility
         const char *fileName,
         std::vector<json> stateList
     );
+
+    void timeline_writer(
+        const char *fileName,
+        const char *arcID,
+        int start_time,
+        int end_time,
+        vector<int> agvIDs,
+        int timeRatio
+    );
+
+    int timeline_getter(const char *fileName);
 
     std::vector<int> getNumPedesInFlow(int junctionType, int totalPedestrian);
 

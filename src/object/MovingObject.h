@@ -62,6 +62,10 @@ public:
 
     float getOrientation();
 
+    // extra function to set/get velocity
+    void setVelocity(float x, float y, float z);
+    
+
     virtual void move(){};
 };
 

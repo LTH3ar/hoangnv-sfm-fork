@@ -180,12 +180,10 @@ void CleanUpData(const char *folderName)
 // write end file
 void Utility::writeResult(const char *fileName, string name, int mode,
                           std::vector<AGV *> agvs,
-                          std::vector<json> juncDataList,
-                          int agvRunConcurrently, int runMode,
-                          int numRunPerHallway, int totalRunningTime, int timeRatio)
+                          std::vector<json> juncDataList, int runMode,
+                          int totalRunningTime, string arcID, int timeRatio)
 {
     CleanUpData("data/output");
-    ofstream output(fileName, ios::app);
     json j;
 
     int easyReadingMode = 1;
@@ -196,25 +194,16 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
     if (runMode == 0)
     {
-        output << "#" << name << " run completed on " << std::ctime(&now);
-
         for (AGV *agv : agvs)
         {
             string array1[] = {"From Left", "From Bottom", "From Right", "From Top"};
             string array2[] = {"Turn Right", "Go straight", "Turn Left"};
             string direction = array1[(int)(agv->getDirection().x)] + "-" +
                                array2[(int)(agv->getDirection().y)];
-            output << name << delimiter << mode << delimiter << direction << delimiter
-                   << convertTime(agv->getTravelingTime()*(1000/timeRatio)) << delimiter
-                   << agv->getNumOfCollision() << endl;
         }
     }
     else
     {
-        if (easyReadingMode == 1)
-        {
-            output << "\n\t*#* Completed on " << std::ctime(&now);
-        }
         if (jsonOutput == 1)
         {
             j["Completed_on"] = std::ctime(&now);
@@ -225,9 +214,10 @@ void Utility::writeResult(const char *fileName, string name, int mode,
         vector<int> travelingTimeList;
 
         int juncIndexTemp = 0;
-
+        int agv_counter = 0;
         for (AGV *agv : agvs)
         {
+            agv_counter++;
             string json_filename = "data/output/result_agv_" + std::to_string(agv->getId()) + ".json";
             // clean up file
             std::ofstream ofs;
@@ -239,11 +229,8 @@ void Utility::writeResult(const char *fileName, string name, int mode,
             {
                 agv->setTotalStopTime(0);
             }
-            int marker = numRunPerHallway * (juncIndexTemp + 1) - 1;
-            if (agvRunConcurrently == 1)
-            {
-                marker = numRunPerHallway * 2 * (juncIndexTemp + 1) - 1;
-            }
+            int marker = agvs.size();// * (juncIndexTemp + 1);
+            
             travelingTimeList.push_back(agv->getTravelingTime());
 
             if (juncIndexTemp < juncDataList.size())
@@ -251,72 +238,25 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                 hallwayName = juncDataList[juncIndexTemp].items().begin().key();
                 hallwayLength = juncDataList[juncIndexTemp].items().begin().value();
 
-                if (easyReadingMode == 1)
-                {
-                    output << hallwayName << delimiter << hallwayLength << ": AGV ID "
-                           << agv->getId() << delimiter
-                           << convertTime(agv->getTravelingTime()*(1000/timeRatio)) << delimiter
-                           << "Collisions " << agv->getNumOfCollision() << delimiter
-                           << "Total stop time " << convertTime(agv->getTotalStopTime()*(1000/timeRatio)) << endl;
-                }
                 if (jsonOutput == 1)
                 {
-                    j["hallwayName"] = hallwayName;
+                    j["hallwayName"] = arcID;
                     j["hallwayLength"] = hallwayLength;
                     j["agvId"] = agv->getId();
-                    j["travelingTime"] = convertTime(agv->getTravelingTime()*(1000/timeRatio));
+                    j["generalDirection"] = agv->getGeneralDirection();
+                    j["travelingTime"] = agv->getTravelingTime()*(1000/timeRatio);
                     j["numOfCollision"] = agv->getNumOfCollision();
-                    j["totalStopTime"] = convertTime(agv->getTotalStopTime()*(1000/timeRatio));
+                    j["totalStopTime"] = agv->getTotalStopTime()*(1000/timeRatio);
+                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(1000/timeRatio);
                 }
             }
 
-            if (agv->getId() == marker)
-            {
-                int minValue = *std::min_element(travelingTimeList.begin(),
-                                                 travelingTimeList.end());
-                int maxValue = *std::max_element(travelingTimeList.begin(),
-                                                 travelingTimeList.end());
-
-                int sum = std::accumulate(travelingTimeList.begin(),
-                                          travelingTimeList.end(), 0);
-                double avgTime = static_cast<double>(sum) / travelingTimeList.size();
-
-                if (easyReadingMode == 1)
-                {
-                    output << "Shortest: " << convertTime(minValue*(1000/timeRatio))
-                           << " - Longest: " << convertTime(maxValue*(1000/timeRatio)) << endl;
-                    output << "Average time to travel through the hallway " << hallwayName
-                           << " is " << convertTime((int)avgTime*(1000/timeRatio)) << "\n"
-                           << endl;
-                }
-                else if (jsonOutput == 1)
-                {
-                    j["shortest"] = minValue*(1000/timeRatio);
-                    j["longest"] = maxValue*(1000/timeRatio);
-                    j["averageTime"] = avgTime*(1000/timeRatio);
-                } 
-                else {
-                    output << hallwayLength << " " << minValue << " " << maxValue << " " << avgTime << endl;
-                }
-
-                travelingTimeList.clear();
-                juncIndexTemp = juncIndexTemp + 1;
-                if (jsonOutput == 1)
-                {
-                    j["totalRunningTime"] = totalRunningTime*(1000/timeRatio);
-                }
-            }
             JsonOutput << j.dump(4) << endl;
             JsonOutput.close();
+            
         }
     }
 
-    if (easyReadingMode == 1)
-    {
-        output << "\t==> Total running time:  " << convertTime(totalRunningTime) << endl;
-    }
-
-    output.close();
 }
 
 // Save state
@@ -375,7 +315,8 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
         */
         agvJson["velocity"] = {
             agv->getVelocity().x,
-            agv->getVelocity().y
+            agv->getVelocity().y,
+            agv->getVelocity().z
         };
 
         // direction(Vector3f)
@@ -389,6 +330,12 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
             agv->getDirection().x,
             agv->getDirection().y
         };
+
+        // General Direction(int)
+        agvJson["generalDirection"] = agv->getGeneralDirection();
+
+        // Reach Destination(bool)
+        agvJson["reachDestination"] = agv->getReachDestination();
 
         // travelingTime(int)
         agvJson["travelingTime"] = agv->getTravelingTime();
@@ -461,7 +408,8 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
         */
         agentJson["velocity"] = {
             agent->getVelocity().x,
-            agent->getVelocity().y
+            agent->getVelocity().y,
+            agent->getVelocity().z
         };
 
         // destination(Point3f)
@@ -539,27 +487,90 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
 // write state
 void Utility::writeState(const char *fileName, std::vector<json> stateList)
 {
-    // clean up file
-    std::ofstream ofs;
-    ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
+
+    // check for file exist
+    json old_data;
+    if (std::filesystem::exists(fileName))
+    {
+        // if file is not empty
+        if (std::filesystem::file_size(fileName) != 0){
+            
+            // read the file
+            std::ifstream f(fileName);
+            old_data = json::parse(f);
+            f.close();
+        }
+    }
+
+    //sort the stateList by event_time ascending order
+    // std::sort(stateList.begin(), stateList.end(), [](json a, json b) {
+    //     return a["event_time"] < b["event_time"];
+    // });
 
     // remove some event_time only take event_time by second instead of by millisecond
     int threshold = 1000;
     std::vector<json> stateListTemp;
     for (json &state : stateList)
     {
-        if (state["event_time"] >= threshold || state["event_time"] == 0)
+        // extra function to remove the completed agv
+        for (int i = 0; i < state["agvs"].size(); i++)
         {
-            stateListTemp.push_back(state);
-            threshold = threshold + 1000;
+            if (state["agvs"][i]["reachDestination"] == true)
+            {
+                state["agvs"].erase(state["agvs"].begin() + i);
+            }
+        }
+        json temp = state;
+        temp["event_time"] = (int)temp["event_time"] / threshold;
+        stateListTemp.push_back(temp);
+    }
+    stateList.clear();
+
+    
+    for (int i = 0; i <= stateListTemp[stateListTemp.size()-1]["event_time"]; i++)
+    {
+        for (json &state : stateListTemp)
+        {
+            if (state["event_time"] == i)
+            {
+                stateList.push_back(state);
+                break;
+            }
+        }
+        
+    }
+
+    // remove duplicate event_time start from the first event in the list(the event which has the lowest event_time)
+    // loop through old_data["timeline"] and remove the duplicate event_time
+    int deleteEventTime = stateListTemp[0]["event_time"];
+    
+    // new stateListTemp
+    std::vector<json> stateListTempNew;
+
+    for (json &state : old_data["timeline"])
+    {
+        if (state["event_time"] < deleteEventTime)
+        {
+            stateListTempNew.push_back(state);
         }
     }
 
+    // clean up file
+    std::ofstream ofs;
+    ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+
     ofstream output(fileName, ios::app);
-    json j;
-    j["timeline"] = stateListTemp;
-    output << j.dump(4) << endl;
+
+    // add the new data to the old data
+    // clean up old_data["timeline"]
+    old_data["timeline"] = stateListTempNew;
+    for (json &state : stateList)
+    {
+        old_data["timeline"].push_back(state);
+    }
+    
+    output << old_data.dump(4) << endl;
     output.close();
 
     // // debug output
@@ -572,6 +583,107 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
     // clean up data
     stateList.clear();
     stateListTemp.clear();
+    old_data.clear();
+    stateListTempNew.clear();
+}
+
+// timeline controller
+void Utility::timeline_writer(
+        const char *fileName,
+        const char *arcID,
+        int start_time,
+        int end_time,
+        vector<int> agvIDs,
+        int timeRatio
+)
+{
+    json j;
+    j["arcID"] = arcID;
+    j["start_time"] = start_time;
+    j["end_time"] = end_time;
+    j["agvIDs"] = agvIDs;
+
+    // load the timeline data then append to the timeline
+    // but first check if the file exist
+    if (!std::filesystem::exists(fileName))
+    {
+        // create the file
+        ofstream output(fileName, ios::app);
+        json data;
+        // data is a list ["timeline": []]
+        data["timeline"] = {};
+        output << data.dump(4) << endl;
+        output.close();
+        }
+
+    // load the timeline data
+    std::ifstream f(fileName);
+    json data = json::parse(f);
+    f.close();
+
+    // struct: 
+    /*
+    {
+        'timeline': [
+            {
+            'arcID': 'arc1',
+            'start_time': 0,
+            'end_time': 1000
+            },
+            {
+            'arcID': 'arc1',
+            'start_time': 1000,
+            'end_time': 2000
+            }
+
+        ]
+    }
+    */
+
+    // remove the data that has start_time >= new start_time and same junction_name and append the new timeline data
+    std::vector<json> timelineTemp;
+    for (json &timeline : data["timeline"])
+    {
+        if (timeline["arcID"] != arcID || timeline["start_time"] < start_time)
+        {
+            timelineTemp.push_back(timeline);
+        }
+    }
+    timelineTemp.push_back(j);
+    data["timeline"] = timelineTemp;
+
+    // write the timeline data back to the file
+    // clean up file
+    std::ofstream ofs;
+    ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
+    
+    ofstream output(fileName, ios::app);
+    output << data.dump(4) << endl;
+    output.close();
+    
+}
+
+int Utility::timeline_getter(const char *fileName)
+{
+    // load the timeline data
+    std::ifstream f(fileName);
+    json data = json::parse(f);
+    f.close();
+
+    // get the most recent timeline data without caring about the arcID
+    // this mean get the highest end_time
+    
+    int max = 0;
+    for (json &timeline : data["timeline"])
+    {
+        if (timeline["end_time"] > max)
+        {
+            max = timeline["end_time"];
+        }
+    }
+    cout << "The most recent timeline data: " << max << endl;
+    return max;
 }
 
 
@@ -583,14 +695,6 @@ std::vector<int> Utility::getNumPedesInFlow(int junctionType,
     if (junctionType == 2)
     {
         numFlow = 6;
-    }
-    else if (junctionType == 3)
-    {
-        numFlow = 18;
-    }
-    else if (junctionType == 4)
-    {
-        numFlow = 12;
     }
 
     std::vector<int> v(numFlow, 0);
@@ -1286,14 +1390,6 @@ std::vector<Point3f> Utility::getRouteAGV(int src, int turningDirection,
     {
         v = getRouteAGVHallway(src, walkwayWidth, juncData);
     }
-    else if (junctionType == 3)
-    {
-        v = getRouteAGVTJunction(src, turningDirection, walkwayWidth, juncData);
-    }
-    else if (junctionType == 4)
-    {
-        v = getRouteAGVCrossRoad(src, turningDirection, walkwayWidth, juncData);
-    }
     return v;
 }
 
@@ -1751,28 +1847,8 @@ bool Utility::isPositionErr(Point3f position, float hallwayWidth,
     float negLimit = -hallwayWidth / 2;
     float x = position.x;
     float y = position.y;
-    if (junctionType == 4)
-    {
-        bool con1 = x >= posLimit && y >= posLimit;
-        bool con2 = x >= posLimit && y <= negLimit;
-        bool con3 = x <= negLimit && y >= posLimit;
-        bool con4 = x <= negLimit && y <= negLimit;
-        if (con1 || con2 || con3 || con4)
-        {
-            return true;
-        }
-    }
-    else if (junctionType == 3)
-    {
-        bool con1 = y >= posLimit;
-        bool con2 = x >= posLimit && y <= negLimit;
-        bool con3 = x <= negLimit && y <= negLimit;
-        if (con1 || con2 || con3)
-        {
-            return true;
-        }
-    }
-    else if (junctionType == 2)
+    
+    if (junctionType == 2)
     {
         if (y >= posLimit || y <= negLimit)
         {
