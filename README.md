@@ -40,5 +40,11 @@ make
 To run simulator
 
 ```cpp
-./app <json file> <map(txt) file>
+./app <json file> <map(txt) file> <eventType(0 or 1)>
 ```
+
+### Known Bugs
+- The simulator is will behave abnormally when there are 2 or more AGVs being generated at the same coordinate and the same time.
+- The simulator will behave abnormally when there are 2 or more AGVs have the same ID.
+- The simulator will give incorrect results when the timeRatio is set to 0 or 1. (10 to 1000 is recommended)
+- The simulator will take a long time to initialize when the data input is too large.
