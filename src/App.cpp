@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     juncData = {length1Side, length1Side};
     
     // Calculate predicted time: input(hallway length+9, desired speed, acceleration), output(predicted completion time)
-    predictedTime = Utility::calculatePredictedTime(hallwayLength + 9, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
+    predictedTime = Utility::calculatePredictedTime(hallwayLength, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
 
     cout << "Predicted time: " << predictedTime << endl;
 
@@ -218,6 +218,10 @@ void init()
 
     event_handler(eventType);
     //cout << "Subtitution time: " << subtitutionTime << endl;
+
+    // calculate the travel length of an AGV using Point3f of getPosition() and getDestination()
+    float travelLength = socialForce->getAGVs()[0]->getPosition().distance(socialForce->getAGVs()[0]->getDestination());
+    cout << "Travel length: " << travelLength << endl;
 
     // add to state list
     json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), (currTime + (timeline_pointer*1000))*(1000/timeRatio));
@@ -658,7 +662,7 @@ void update()
             }
             count_agents = count_agents + 1;
         }
-        cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agent->getVelocity().length() << endl;
+        //cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agent->getVelocity().length() << endl;
     }
 
     // std::vector<AGV *> agvs = socialForce->getAGVs();
@@ -725,7 +729,7 @@ void update()
             count_agvs = count_agvs + 1;
         }
 
-        cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agv->getVelocity().length() << " Reach Destination: " << agv->getReachDestination() << endl;
+       //cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agv->getVelocity().length() << " Reach Destination: " << agv->getReachDestination() << endl;
     }
     // History of the simulation
     json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), (currTime + (timeline_pointer*1000))*(1000/timeRatio));
@@ -759,12 +763,6 @@ void update()
 
         //input : const char *fileName, std::vector<json> stateList
         Utility::writeState(state_filename.c_str(), Simulator_State_Stream);
-
-        // print the state list
-        for (json state : Simulator_State_Stream)
-        {
-            cout << state << endl;
-        }
         
         exit(0); // Terminate program
     }

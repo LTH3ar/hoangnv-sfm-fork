@@ -907,6 +907,10 @@ std::vector<float> Utility::getMapLimit(float walkwayWidth,
     float rightWidthLimit = -1;
     float lowerHeightLimit = -1;
     float upperHeightLimit = -1;
+    // float leftWidthLimit = 0;
+    // float rightWidthLimit = 0;
+    // float lowerHeightLimit = 0;
+    // float upperHeightLimit = 0;
 
     float temp = walkwayWidth / 2;
 
