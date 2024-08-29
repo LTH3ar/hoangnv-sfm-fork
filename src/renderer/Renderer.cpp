@@ -162,8 +162,8 @@ void Renderer::drawWalls(SocialForce *socialForce)
     for (Wall *wall : walls)
     {
         glBegin(GL_LINES);
-        glVertex2f(wall->getStartPoint().x, wall->getStartPoint().y);
-        glVertex2f(wall->getEndPoint().x, wall->getEndPoint().y);
+        glVertex2f(wall->getStartPoint().x+2, wall->getStartPoint().y);
+        glVertex2f(wall->getEndPoint().x-2, wall->getEndPoint().y);
         glEnd();
     }
     glPopMatrix();

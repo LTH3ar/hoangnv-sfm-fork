@@ -125,6 +125,7 @@ int main(int argc, char **argv)
     
     juncDataList = Utility::convertMapData(mapData);
     float hallwayLength = juncDataList[juncIndex].items().begin().value();
+    cout << "Hallway length: " << hallwayLength << endl;
 
     // cout << "Hallway length: " << hallwayLength << endl;
     // cout << "desired speed: " << inputData["agvDesiredSpeed"]["value"] << endl;
@@ -134,7 +135,7 @@ int main(int argc, char **argv)
     juncData = {length1Side, length1Side};
     
     // Calculate predicted time: input(hallway length+9, desired speed, acceleration), output(predicted completion time)
-    predictedTime = Utility::calculatePredictedTime(hallwayLength, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
+    predictedTime = Utility::calculatePredictedTime(hallwayLength+1, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
 
     cout << "Predicted time: " << predictedTime << endl;
 
