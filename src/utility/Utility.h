@@ -25,7 +25,7 @@ namespace Utility
 
     json readInputData(const char *fileName);
 
-    int calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, int timeRatio);
+    int calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, float timeRatio);
 
     void writeResult(
         const char *fileName, std::string name, int mode, std::vector<AGV *> data,
@@ -41,7 +41,7 @@ namespace Utility
         // list of Agents
         std::vector<Agent *> agents,
         // time stamp (ms)
-        int time
+        float time
     );
 
     void writeState(
@@ -54,8 +54,7 @@ namespace Utility
         const char *arcID,
         int start_time,
         int end_time,
-        vector<int> agvIDs,
-        int timeRatio
+        vector<int> agvIDs
     );
 
     int timeline_getter(const char *fileName);

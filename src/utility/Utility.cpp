@@ -29,7 +29,7 @@ float Utility::randomFloat(float lowerBound, float upperBound)
 }
 
 // calculate predicted time
-int Utility::calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, int timeRatio) {
+int Utility::calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, float timeRatio) {
     // Time to reach desired speed
     float t1 = desiredSpeed / acceleration;
     
@@ -45,14 +45,14 @@ int Utility::calculatePredictedTime(float hallwayLength, float desiredSpeed, flo
         float t2 = d2 / desiredSpeed;
         
         // Total time
-        return (t1 + t2)*timeRatio;
+        return (float)(t1 + t2)*1000.0f;
     } else {
         // If the object does not reach the desired speed, solve for time using quadratic equation
         // d = 0.5 * a * t^2
         // 0.5 * a * t^2 = d
         // t^2 = 2 * d / a
         // t = sqrt(2 * d / a)
-        return sqrt(2 * hallwayLength / acceleration)*timeRatio;
+        return (float)sqrt(2 * hallwayLength / acceleration)*1000.0f;
     }
 }
 
@@ -244,10 +244,10 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     j["hallwayLength"] = hallwayLength;
                     j["agvId"] = agv->getId();
                     j["generalDirection"] = agv->getGeneralDirection();
-                    j["travelingTime"] = agv->getTravelingTime()*(1000/timeRatio);
+                    j["travelingTime"] = agv->getTravelingTime()*(timeRatio);
                     j["numOfCollision"] = agv->getNumOfCollision();
-                    j["totalStopTime"] = agv->getTotalStopTime()*(1000/timeRatio);
-                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(1000/timeRatio);
+                    j["totalStopTime"] = agv->getTotalStopTime()*(timeRatio);
+                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
                 }
             }
 
@@ -267,7 +267,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
 // Save state
 json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
-                        int time)
+                        float time)
 {
     /*structure of json file
     [
@@ -599,8 +599,7 @@ void Utility::timeline_writer(
         const char *arcID,
         int start_time,
         int end_time,
-        vector<int> agvIDs,
-        int timeRatio
+        vector<int> agvIDs
 )
 {
     json j;

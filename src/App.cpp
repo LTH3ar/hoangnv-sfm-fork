@@ -28,7 +28,7 @@ SocialForce *socialForce;
 float fps = 0; // Frames per second
 int currTime = 0;
 int startTime = 0;
-int predictedTime = 0;
+float predictedTime = 0;
 bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
 json timeline_queue;
@@ -38,13 +38,14 @@ json previousEventData;
 int eventType = 0;
 int timeline_pointer = 0;
 std::vector<json> Simulator_State_Stream;
-int timeRatio = 1;
+float timeRatio = 1.0f;
 int subtitutionTime = 0;
 int runMode = 1;
 int graphicsMode = 1;
 int jsonOutput = 1;
 int numAGVinit = 0;
 int numAGVCurr = 0;
+float ajustedTime = 0;
 
 
 
@@ -135,7 +136,7 @@ int main(int argc, char **argv)
     juncData = {length1Side, length1Side};
     
     // Calculate predicted time: input(hallway length+9, desired speed, acceleration), output(predicted completion time)
-    predictedTime = Utility::calculatePredictedTime(hallwayLength+1, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
+    predictedTime = Utility::calculatePredictedTime(hallwayLength+0.8, inputData["agvDesiredSpeed"]["value"], inputData["acceleration"]["value"], timeRatio);
 
     cout << "Predicted time: " << predictedTime << endl;
 
@@ -225,7 +226,8 @@ void init()
     cout << "Travel length: " << travelLength << endl;
 
     // add to state list
-    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), (currTime + (timeline_pointer*1000))*(1000/timeRatio));
+    ajustedTime += (float)timeline_pointer;
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime*1000.0f);
     Simulator_State_Stream.push_back(current_State);
 }
 
@@ -606,17 +608,17 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos)
 // Update function to update the scene(to be called continuously to move the agents and AGVs)
 void update()
 {
-    int frameTime;       // Store time in milliseconds
-    static int prevTime; // Stores time in milliseconds
-
+    static int prevTime;
     currTime = glutGet(GLUT_ELAPSED_TIME); // Get time in milliseconds since 'glutInit()' called
-    frameTime = currTime - prevTime;
+    int frameTime = currTime - prevTime;
+    float stepTime = frameTime / 1000.0f * timeRatio; // this one in seconds
+
+    // ajustedTime in milliseconds
+    ajustedTime += stepTime*1000.0f;
+
     prevTime = currTime;
 
     int count_agents = 0, count_agvs = 0;
-
-    //std::vector<Agent *> agents = socialForce->getCrowd();
-    int run_time = (currTime - startTime + (timeline_pointer*1000))*(1000/timeRatio);
 
     // History of the simulation
     // json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), (currTime + (timeline_pointer*1000))*(1000/timeRatio));
@@ -696,7 +698,7 @@ void update()
             if (agv->getIsMoving())
             {
                 agv->setTravelingTime(glutGet(GLUT_ELAPSED_TIME) - agv->getTravelingTime());
-                std::cout << "Traveling time: " << convertTime(agv->getTravelingTime()*(1000/timeRatio)) << endl;
+                std::cout << "Traveling time: " << convertTime(agv->getTravelingTime()*timeRatio) << endl;
                 agv->setIsMoving(false);
 
                 int numAGVCompleted = getNumAGVCompleted(socialForce->getAGVs());
@@ -733,7 +735,7 @@ void update()
        //cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agv->getVelocity().length() << " Reach Destination: " << agv->getReachDestination() << endl;
     }
     // History of the simulation
-    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), (currTime + (timeline_pointer*1000))*(1000/timeRatio));
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime);
     Simulator_State_Stream.push_back(current_State);
 
     if (count_agvs == socialForce->getAGVs().size())
@@ -755,7 +757,7 @@ void update()
             endAgvIDs.push_back(agv->getId());
         }
 
-        Utility::timeline_writer("data/timeline/timeline.json", AGV_on_Hallway_ID.c_str(), timeline_pointer, (currTime/timeRatio)+timeline_pointer, endAgvIDs, timeRatio);
+        Utility::timeline_writer("data/timeline/timeline.json", AGV_on_Hallway_ID.c_str(), timeline_pointer, ajustedTime, endAgvIDs);
 
         //std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
         //std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
@@ -772,8 +774,8 @@ void update()
     {
         // socialForce->moveCrowd(static_cast<float>(frameTime) / 1000); // Perform calculations and move agents
         // socialForce->moveAGVs(static_cast<float>(frameTime) / 1000);
-        socialForce->moveCrowd(static_cast<float>(frameTime) / timeRatio); // Perform calculations and move agents
-        socialForce->moveAGVs(static_cast<float>(frameTime) / timeRatio);
+        socialForce->moveCrowd(stepTime); // Perform calculations and move agents
+        socialForce->moveAGVs(stepTime);
     }
     computeFPS(&fps);
     glutPostRedisplay();
