@@ -234,7 +234,7 @@ void event_handler(int eventType)
     numAGVinit = inputData["agvIDs"]["value"].size();
     cout << "Number of AGVs: " << numAGVinit << endl;
     new_AGVs_Direction = (vector<int>)inputData["agvDirections"]["value"];
-    cout << "AGV Direction: " << new_AGVs_Direction[0] << endl;
+    //cout << "AGV Direction: " << new_AGVs_Direction[0] << endl;
     if (eventType == 0)
     {
         socialForce = new SocialForce;
@@ -276,7 +276,7 @@ json getEventData(int timeline_pointer)
 void createWalls()
 {
     Wall *wall;
-    cout << "Junction size: " << juncData.size() << endl;
+    //cout << "Junction size: " << juncData.size() << endl;
 
     vector<float> coors = Utility::getWallCoordinates(walkwayWidth, juncData);
 
@@ -757,8 +757,8 @@ void update()
 
         Utility::timeline_writer("data/timeline/timeline.json", AGV_on_Hallway_ID.c_str(), timeline_pointer, (currTime/timeRatio)+timeline_pointer, endAgvIDs, timeRatio);
 
-        std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
-        std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
+        //std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
+        //std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
         delete socialForce;
         socialForce = 0;
 

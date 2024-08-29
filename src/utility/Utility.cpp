@@ -204,10 +204,10 @@ void Utility::writeResult(const char *fileName, string name, int mode,
     }
     else
     {
-        if (jsonOutput == 1)
-        {
-            j["Completed_on"] = std::ctime(&now);
-        }
+        // if (jsonOutput == 1)
+        // {
+        //     j["Completed_on"] = std::ctime(&now);
+        // }
 
         string hallwayName;
         float hallwayLength;
@@ -249,6 +249,12 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     j["totalStopTime"] = agv->getTotalStopTime()*(1000/timeRatio);
                     j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(1000/timeRatio);
                 }
+            }
+
+            //print j to console
+            if (jsonOutput == 1)
+            {
+                cout << j.dump(4) << endl;
             }
 
             JsonOutput << j.dump(4) << endl;
