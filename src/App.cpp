@@ -221,20 +221,20 @@ void init()
     event_handler(eventType);
     //cout << "Subtitution time: " << subtitutionTime << endl;
 
-    // calculate the travel length of an AGV using Point3f of getPosition() and getDestination()
-    float travelLength = socialForce->getAGVs()[0]->getPosition().distance(socialForce->getAGVs()[0]->getDestination());
-    cout << "Travel length: " << travelLength << endl;
+    // // calculate the travel length of an AGV using Point3f of getPosition() and getDestination()
+    // float travelLength = socialForce->getAGVs()[0]->getPosition().distance(socialForce->getAGVs()[0]->getDestination());
+    // cout << "Travel length: " << travelLength << endl;
 
     // add to state list
     ajustedTime += (float)timeline_pointer;
-    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime*1000.0f);
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime*1000.0f, timeline_pointer);
     Simulator_State_Stream.push_back(current_State);
 }
 
 void event_handler(int eventType)
 {
     numAGVinit = inputData["agvIDs"]["value"].size();
-    cout << "Number of AGVs: " << numAGVinit << endl;
+    
     new_AGVs_Direction = (vector<int>)inputData["agvDirections"]["value"];
     //cout << "AGV Direction: " << new_AGVs_Direction[0] << endl;
     if (eventType == 0)
@@ -258,6 +258,7 @@ void event_handler(int eventType)
         test_createAGVs_with_previousData(new_AGVs_Direction, previousEventData["agvs"]);
     }
     numAGVCurr = socialForce->getAGVs().size();
+    cout << "Number of AGVs: " << numAGVCurr << endl;
 }
 
 json getEventData(int timeline_pointer)
@@ -735,7 +736,7 @@ void update()
        //cout << "AGV ID: " << agv->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agv->getVelocity().length() << " Reach Destination: " << agv->getReachDestination() << endl;
     }
     // History of the simulation
-    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime);
+    json current_State = Utility::SaveState(socialForce->getAGVs(), socialForce->getCrowd(), ajustedTime, timeline_pointer);
     Simulator_State_Stream.push_back(current_State);
 
     if (count_agvs == socialForce->getAGVs().size())
@@ -748,7 +749,10 @@ void update()
             runMode,
             totalRunningTime,
             AGV_on_Hallway_ID,
-            timeRatio);
+            timeRatio,
+            timeline_pointer,
+            eventType,
+            inputData["agvIDs"]["value"]);
 
         // get the list of agv IDs
         std::vector<int> endAgvIDs;
@@ -760,12 +764,12 @@ void update()
         Utility::timeline_writer("data/timeline/timeline.json", AGV_on_Hallway_ID.c_str(), timeline_pointer, ajustedTime, endAgvIDs);
 
         //std::cout << "Maximum speed: " << maxSpeed << " - Minimum speed: " << minSpeed << endl;
-        //std::cout << "Finish in: " << Utility::convertTime(totalRunningTime) << totalRunningTime << endl;
+        std::cout << "Finish in: " << totalRunningTime << endl;
         delete socialForce;
         socialForce = 0;
 
         //input : const char *fileName, std::vector<json> stateList
-        Utility::writeState(state_filename.c_str(), Simulator_State_Stream);
+        Utility::writeState(state_filename.c_str(), Simulator_State_Stream, timeline_pointer);
         
         exit(0); // Terminate program
     }

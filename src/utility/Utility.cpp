@@ -181,7 +181,7 @@ void CleanUpData(const char *folderName)
 void Utility::writeResult(const char *fileName, string name, int mode,
                           std::vector<AGV *> agvs,
                           std::vector<json> juncDataList, int runMode,
-                          int totalRunningTime, string arcID, int timeRatio)
+                          int totalRunningTime, string arcID, int timeRatio, int timeline_pointer, int eventType, vector<int> NewAgvIDs)
 {
     CleanUpData("data/output");
     json j;
@@ -247,7 +247,19 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     j["travelingTime"] = agv->getTravelingTime()*(timeRatio);
                     j["numOfCollision"] = agv->getNumOfCollision();
                     j["totalStopTime"] = agv->getTotalStopTime()*(timeRatio);
-                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
+                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio)+(timeline_pointer*1000);
+                    if (eventType == 1)
+                    {
+                        for (int i = 0; i < NewAgvIDs.size(); i++)
+                        {
+                            if (agv->getId() == NewAgvIDs[i])
+                            {
+                                j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
+                            }
+                        }
+                        
+                    }
+                    
                 }
             }
 
@@ -267,7 +279,7 @@ void Utility::writeResult(const char *fileName, string name, int mode,
 
 // Save state
 json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
-                        float time)
+                        float time, int timeline_pointer)
 {
     /*structure of json file
     [
@@ -293,7 +305,7 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
     ]
     */
     json j;
-    j["event_time"] = time;
+    j["event_time"] = time+(float)(timeline_pointer*1000.0f);
     std::vector<json> agvList;
     for (AGV *agv : agvs)
     {
@@ -491,7 +503,7 @@ json Utility::SaveState(std::vector<AGV *> agvs, std::vector<Agent *> agents,
 }
 
 // write state
-void Utility::writeState(const char *fileName, std::vector<json> stateList)
+void Utility::writeState(const char *fileName, std::vector<json> stateList, int timeline_pointer)
 {
 
     // check for file exist
@@ -504,6 +516,10 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
             // read the file
             std::ifstream f(fileName);
             old_data = json::parse(f);
+            // clean up file
+            std::ofstream ofs;
+            ofs.open(fileName, std::ofstream::out | std::ofstream::trunc);
+            ofs.close();
             f.close();
         }
     }
@@ -548,7 +564,7 @@ void Utility::writeState(const char *fileName, std::vector<json> stateList)
 
     // remove duplicate event_time start from the first event in the list(the event which has the lowest event_time)
     // loop through old_data["timeline"] and remove the duplicate event_time
-    int deleteEventTime = stateListTemp[0]["event_time"];
+    int deleteEventTime = timeline_pointer;
     
     // new stateListTemp
     std::vector<json> stateListTempNew;
@@ -605,7 +621,7 @@ void Utility::timeline_writer(
     json j;
     j["arcID"] = arcID;
     j["start_time"] = start_time;
-    j["end_time"] = end_time;
+    j["end_time"] = end_time/1000;
     j["agvIDs"] = agvIDs;
 
     // load the timeline data then append to the timeline

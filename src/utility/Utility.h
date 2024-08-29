@@ -33,7 +33,10 @@ namespace Utility
         int runMode,
         int totalRunningTime,
         string arcID,
-        int timeRatio);
+        int timeRatio,
+        int timeline_pointer,
+        int eventType,
+        vector<int> NewAgvIDs);
 
     json SaveState(
         // list of AGVs
@@ -41,12 +44,14 @@ namespace Utility
         // list of Agents
         std::vector<Agent *> agents,
         // time stamp (ms)
-        float time
+        float time,
+        int timeline_pointer
     );
 
     void writeState(
         const char *fileName,
-        std::vector<json> stateList
+        std::vector<json> stateList,
+        int timeline_pointer
     );
 
     void timeline_writer(
