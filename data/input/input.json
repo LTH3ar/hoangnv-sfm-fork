@@ -21,7 +21,7 @@
   },
   "acceleration": {
     "description": "Acceleration of AGV",
-    "value": 0.25
+    "value": 0
   },
   "agvDesiredSpeed": {
     "description": "Desired speed of AGV (m/s)",
