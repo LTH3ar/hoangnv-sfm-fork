@@ -1432,9 +1432,9 @@ std::vector<Point3f> Utility::getRouteAGVHallway(int src, float walkwayWidth,
         // v.insert(v.end(), {Point3f(leftWidthLimit - 1, -walkwayWidth / 3, 0.0),
         //                    Point3f(rightWidthLimit + 1, -walkwayWidth / 3, 0.0)});
         // v.insert(v.end(), {Point3f(rightWidthLimit + 2, -walkwayWidth / 3, 0.0)});
-        v.insert(v.end(), {Point3f(leftWidthLimit + 1, -walkwayWidth / 3, 0.0),
-                           Point3f(rightWidthLimit - 1, -walkwayWidth / 3, 0.0)});
-        v.insert(v.end(), {Point3f(rightWidthLimit - 1, -walkwayWidth / 3, 0.0)});
+        v.insert(v.end(), {Point3f(leftWidthLimit + 1.3, -walkwayWidth / 3, 0.0),
+                           Point3f(rightWidthLimit - 1.3, -walkwayWidth / 3, 0.0)});
+        v.insert(v.end(), {Point3f(rightWidthLimit - 1.3, -walkwayWidth / 3, 0.0)});
         return v;
     }
     else
