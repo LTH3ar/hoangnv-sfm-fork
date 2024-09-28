@@ -737,15 +737,9 @@ std::vector<int> Utility::getNumPedesInFlow(int junctionType,
 std::vector<double> Utility::getPedesVelocity(int type, json inputData,
                                               float deviationParam)
 {
-    if (type == 0)
-    {
-        return getPedesVelocityBasedDDis(inputData, deviationParam);
-    }
-    else
-    {
-        return getPedesVelocityBasedTDis(int(inputData["numOfAgents"]["value"]),
-                                         inputData["TDDegree"]["value"]);
-    }
+    
+    return getPedesVelocityBasedDDis(inputData, deviationParam);
+    
 }
 
 std::vector<double> Utility::getPedesVelocityBasedDDis(json inputData,
@@ -808,51 +802,6 @@ std::vector<double> Utility::getPedesVelocityBasedDDis(json inputData,
     for (int i = 0; i < numPedes - curSize; i++)
     {
         v.push_back(map[0]);
-    }
-
-    return v;
-}
-
-std::vector<double> Utility::getPedesVelocityBasedTDis(int numPedes,
-                                                       double n_dist)
-{
-    vector<double> v;
-    double std = sqrt(n_dist / (n_dist + 2));
-
-    std::mt19937 gen(1701);
-
-    std::student_t_distribution<> distr(n_dist);
-
-    // std::cout << "min() == " << distr.min() << std::endl;
-    // std::cout << "max() == " << distr.max() << std::endl;
-    // std::cout << "n() == " << std::fixed << std::setw(11) <<
-    // std::setprecision(10) << distr.n() << std::endl;
-
-    // generate the distribution as a histogram
-    std::map<double, int> histogram;
-    for (int i = 0; i < numPedes; ++i)
-    {
-        ++histogram[distr(gen)];
-    }
-
-    // std::cout << "Distribution for " << numPedes << " samples:" << std::endl;
-    // int counter = 0;
-    for (const auto &elem : histogram)
-    {
-        // std::cout << std::fixed << std::setw(11) << ++counter << ": "
-        //           << std::setw(14) << std::setprecision(3) << elem.first <<
-        //           std::endl;
-        double velocity = std * elem.first * 0.1 + MEAN;
-        if (velocity > 1.8)
-        {
-            velocity = UPPER_SPEED_LIMIT;
-        }
-        else if (velocity < 0.6)
-        {
-            velocity = LOWER_SPEED_LIMIT;
-        }
-
-        v.push_back(velocity);
     }
 
     return v;
