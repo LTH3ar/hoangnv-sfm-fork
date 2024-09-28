@@ -429,40 +429,40 @@ void createAgentAlt(json agents)
         setAgentsFlowAlt(agent, agents[i]);
     }
 
-    // add more number of agents to compensate the number of agents: new agents = inputData["numOfAgents"]["value"] - numOfPeople
-    int newAgents = int(inputData["numOfAgents"]["value"]) - numOfPeople;
-    if (newAgents > 0){
-        float deviationParam = randomFloat(1 - (float)inputData["experimentalDeviation"]["value"] / 100, 1 + (float)inputData["experimentalDeviation"]["value"] / 100);
-        vector<double> velocityList = Utility::getPedesVelocity(classificationType, inputData, deviationParam);
-        if (classificationType == 0)
-        {
-            minSpeed = 0.52;
-            maxSpeed = 2.28;
-        }
-        else
-        {
-            minSpeed = velocityList[0];
-            maxSpeed = velocityList[velocityList.size() - 1];
-        }
+    // // add more number of agents to compensate the number of agents: new agents = inputData["numOfAgents"]["value"] - numOfPeople
+    // int newAgents = int(inputData["numOfAgents"]["value"]) - numOfPeople;
+    // if (newAgents > 0){
+    //     float deviationParam = randomFloat(1 - (float)inputData["experimentalDeviation"]["value"] / 100, 1 + (float)inputData["experimentalDeviation"]["value"] / 100);
+    //     vector<double> velocityList = Utility::getPedesVelocity(classificationType, inputData, deviationParam);
+    //     if (classificationType == 0)
+    //     {
+    //         minSpeed = 0.52;
+    //         maxSpeed = 2.28;
+    //     }
+    //     else
+    //     {
+    //         minSpeed = velocityList[0];
+    //         maxSpeed = velocityList[velocityList.size() - 1];
+    //     }
 
-        auto rng = std::default_random_engine{};
-        std::shuffle(velocityList.begin(), velocityList.end(), rng);
+    //     auto rng = std::default_random_engine{};
+    //     std::shuffle(velocityList.begin(), velocityList.end(), rng);
 
-        int pedesCount = 0;
+    //     int pedesCount = 0;
 
-        if (juncData.size() == 2)
-        {
-            for (int idx = 0; idx < 6; idx++)
-            {
-                for (int temp = 0; temp < newAgents; temp++)
-                {
-                    agent = new Agent;
-                    setAgentsFlow(agent, velocityList[pedesCount], maxSpeed, minSpeed, idx);
-                    pedesCount = pedesCount + 1;
-                }
-            }
-        }
-    }
+    //     if (juncData.size() == 2)
+    //     {
+    //         for (int idx = 0; idx < 6; idx++)
+    //         {
+    //             for (int temp = 0; temp < newAgents; temp++)
+    //             {
+    //                 agent = new Agent;
+    //                 setAgentsFlow(agent, velocityList[pedesCount], maxSpeed, minSpeed, idx);
+    //                 pedesCount = pedesCount + 1;
+    //             }
+    //         }
+    //     }
+    // }
 
 }
 
