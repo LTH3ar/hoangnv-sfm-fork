@@ -68,8 +68,6 @@ namespace Utility
 
     std::vector<double> getPedesVelocity(int type, json inputData, float deviationParam);
 
-    std::vector<double> getPedesVelocityBasedTDis(int numPedes, double n_dist);
-
     std::vector<double> getPedesVelocityBasedDDis(json inputData, float deviationParam);
 
     std::vector<float> getWallCoordinates(float walkwayWidth, std::vector<float> juncData);

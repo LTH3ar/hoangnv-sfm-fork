@@ -76,7 +76,7 @@ void createWalls();
 
 void test_createAGV(int spawn_count, int direction, int agvID, float gap);
 void test_createAGVs(int numberOfAGVs, vector<int> direction);
-void test_createAGVs_with_previousData(vector<int> direction, json agvs_data);
+void test_createAGVs_with_previousData(json agvs_data);
 
 void createAgents();
 void createAgentAlt(json agents);
@@ -255,10 +255,11 @@ void event_handler(int eventType)
         createAgentAlt(previousEventData["agents"]);
         //createAGVsAlt(previousEventData["agvs"]);
         numAGVinit = numAGVinit + previousEventData["agvs"].size();
-        test_createAGVs_with_previousData(new_AGVs_Direction, previousEventData["agvs"]);
+        test_createAGVs_with_previousData(previousEventData["agvs"]);
     }
     numAGVCurr = socialForce->getAGVs().size();
     cout << "Number of AGVs: " << numAGVCurr << endl;
+    cout << "Number of Agents: " << socialForce->getCrowdSize() << endl;
 }
 
 json getEventData(int timeline_pointer)
@@ -423,6 +424,12 @@ void createAgentAlt(json agents)
     // get the number of agents from previous event
     int numOfPeople = agents.size();
 
+    if (numOfPeople == 0)
+    {
+        cout << "No agents in the previous event" << endl;
+        createAgents();
+    }
+
     for (int i = 0; i < numOfPeople; i++)
     {
         agent = new Agent;
@@ -535,13 +542,15 @@ void test_createAGVs(int numberOfAGVs, vector<int> direction)
     }
 }
 
-void test_createAGVs_with_previousData(vector<int> direction, json agvs_data)
+void test_createAGVs_with_previousData(json agvs_data)
 {
+
     // init all the AGVs from the previous event
     for (int i = 0; i < agvs_data.size(); i++)
     {
         test_createAGV(i, agvs_data[i]["generalDirection"], agvs_data[i]["id"], 0.3);
     }
+
 
     for (AGV *agv : socialForce->getAGVs())
     {
@@ -557,6 +566,21 @@ void test_createAGVs_with_previousData(vector<int> direction, json agvs_data)
             }
         }
     }
+
+    for (int i = 0; i < inputData["agvIDs"]["value"].size(); i++) 
+    {
+        for (AGV *agv : socialForce->getAGVs())
+        {
+            if (agv->getId() == inputData["agvIDs"]["value"][i])
+            {
+                // remove the AGV from the new AGVs list in inputData
+                inputData["agvIDs"]["value"].erase(i);
+                inputData["agvDirections"]["value"].erase(i);
+            }
+        }
+    }
+
+    std::vector<int> direction = (vector<int>)inputData["agvDirections"]["value"];
 
     // init new AGVs
     vector<int> left2right;
