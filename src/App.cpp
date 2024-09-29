@@ -31,6 +31,7 @@ int startTime = 0;
 float predictedTime = 0;
 bool animate = false; // Animate scene flag
 float speedConsiderAsStop = 0.2;
+float speedConsiderAsCollision = 0.3;
 json timeline_queue;
 
 json inputData;
@@ -698,13 +699,14 @@ void update()
 
         // using similar mechinism to the AGV to check the collision, if the agent is moving and the speed is less than the speedConsiderAsStop then start the collision
         // if the time of collision is more than 3 seconds then remove the agent
-        if (agent->getCollisionStartTime() == 0 && agent->getVelocity().length() < speedConsiderAsStop && agent->getIsMoving())
+        if (agent->getCollisionStartTime() == 0 && agent->getVelocity().length() < speedConsiderAsStop)
         {
+            cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << " Current_Speed: " << agent->getVelocity().length() << endl;
             agent->setCollisionStartTime(glutGet(GLUT_ELAPSED_TIME));
             // cout << "- Start collision: " << convertTime(agent->getCollisionStartTime()) << endl;
         }
 
-        if (agent->getCollisionStartTime() != 0 && agent->getVelocity().length() > speedConsiderAsStop && agent->getIsMoving())
+        if (agent->getCollisionStartTime() != 0 && agent->getVelocity().length() > speedConsiderAsStop)
         {
             agent->setTotalStopTime(agent->getTotalStopTime() + glutGet(GLUT_ELAPSED_TIME) - agent->getCollisionStartTime());
             // cout << "- Stop collision: " << convertTime(glutGet(GLUT_ELAPSED_TIME)) << endl;
@@ -716,6 +718,7 @@ void update()
         if (agent->getTotalStopTime() > stop_time_limit)
         {
             socialForce->removeAgent(agent->getId());
+            cout << "Remove agent: " << agent->getId() << " - Total stop time: " << agent->getTotalStopTime() << endl;
             continue;
         }
 
