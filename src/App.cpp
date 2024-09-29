@@ -701,17 +701,17 @@ void update()
         // if the time of collision is more than 3 seconds then remove the agent
         if (agent->getCollisionStartTime() == 0 && agent->getVelocity().length() < speedConsiderAsStop)
         {
-            cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << " Current_Speed: " << agent->getVelocity().length() << endl;
+            //cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << " Current_Speed: " << agent->getVelocity().length() << endl;
             agent->setCollisionStartTime(glutGet(GLUT_ELAPSED_TIME));
             // cout << "- Start collision: " << convertTime(agent->getCollisionStartTime()) << endl;
         }
 
-        if (agent->getCollisionStartTime() != 0 && agent->getVelocity().length() > speedConsiderAsStop)
+        if (agent->getCollisionStartTime() != 0 && agent->getVelocity().length() < speedConsiderAsStop)
         {
             agent->setTotalStopTime(agent->getTotalStopTime() + glutGet(GLUT_ELAPSED_TIME) - agent->getCollisionStartTime());
             // cout << "- Stop collision: " << convertTime(glutGet(GLUT_ELAPSED_TIME)) << endl;
             // cout << "=> Total collision: " << convertTime(agent->getTotalStopTime()) << endl;
-            agent->setCollisionStartTime(0);
+            //agent->setCollisionStartTime(0);
         }
 
         // remove the agent if the total stop time is more than 3 seconds
