@@ -247,15 +247,31 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     j["travelingTime"] = agv->getTravelingTime()*(timeRatio);
                     j["numOfCollision"] = agv->getNumOfCollision();
                     j["totalStopTime"] = agv->getTotalStopTime()*(timeRatio);
-                    j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio)+(timeline_pointer*1000);
+                    if ((int)(agv->getTravelingTime()+agv->getTotalStopTime()*(timeRatio)) < (int)((hallwayLength * 0.6) * 1000))
+                    {
+                        j["AGVRealTime"] = (hallwayLength * 0.6) * 1000;
+                        j["AGVCurrTime"] = (hallwayLength * 0.6) * 1000 +(timeline_pointer*1000);    
+                    }
+                    else {
+                        j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
+                        j["AGVCurrTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio)+(timeline_pointer*1000);
+                    }
+                    
                     if (eventType == 1)
                     {
                         for (int i = 0; i < NewAgvIDs.size(); i++)
                         {
                             if (agv->getId() == NewAgvIDs[i])
                             {
-                                j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
+                                if ((int)(agv->getTravelingTime()+agv->getTotalStopTime()*(timeRatio)) < (int)((hallwayLength * 0.6) * 1000))
+                                {
+                                    j["AGVCurrTime"] = (hallwayLength * 0.6) * 1000 +(timeline_pointer*1000);    
+                                }
+                                else {
+                                    j["AGVCurrTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
+                                }
                             }
+
                         }
                         
                     }
