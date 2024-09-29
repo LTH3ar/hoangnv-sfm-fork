@@ -669,7 +669,7 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos)
 // Update function to update the scene(to be called continuously to move the agents and AGVs)
 void update()
 {
-    int stop_time_limit = 3000; // 3 seconds
+    int stop_time_limit = 10000; // 10 seconds
     static int prevTime;
     currTime = glutGet(GLUT_ELAPSED_TIME); // Get time in milliseconds since 'glutInit()' called
     int frameTime = currTime - prevTime;
