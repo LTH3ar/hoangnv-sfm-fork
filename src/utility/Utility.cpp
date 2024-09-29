@@ -249,8 +249,8 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                     j["totalStopTime"] = agv->getTotalStopTime()*(timeRatio);
                     if ((int)(agv->getTravelingTime()+agv->getTotalStopTime()*(timeRatio)) < (int)((hallwayLength * 0.6) * 1000))
                     {
-                        j["AGVRealTime"] = (hallwayLength * 0.6) * 1000;
-                        j["AGVCurrTime"] = (hallwayLength * 0.6) * 1000 +(timeline_pointer*1000);    
+                        j["AGVRealTime"] = (int)((hallwayLength / 0.6) * 1000);
+                        j["AGVCurrTime"] = (int)((hallwayLength / 0.6) * 1000) +(timeline_pointer*1000);    
                     }
                     else {
                         j["AGVRealTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
@@ -263,9 +263,9 @@ void Utility::writeResult(const char *fileName, string name, int mode,
                         {
                             if (agv->getId() == NewAgvIDs[i])
                             {
-                                if ((int)(agv->getTravelingTime()+agv->getTotalStopTime()*(timeRatio)) < (int)((hallwayLength * 0.6) * 1000))
+                                if ((int)(agv->getTravelingTime()+agv->getTotalStopTime()*(timeRatio)) < (int)((hallwayLength / 0.6) * 1000))
                                 {
-                                    j["AGVCurrTime"] = (hallwayLength * 0.6) * 1000 +(timeline_pointer*1000);    
+                                    j["AGVCurrTime"] = (hallwayLength / 0.6) * 1000 +(timeline_pointer*1000);    
                                 }
                                 else {
                                     j["AGVCurrTime"] = (agv->getTravelingTime()+agv->getTotalStopTime())*(timeRatio);
