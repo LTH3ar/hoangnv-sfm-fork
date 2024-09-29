@@ -701,6 +701,7 @@ void update()
         // if the time of collision is more than 3 seconds then remove the agent
         if (agent->getCollisionStartTime() == 0 && agent->getVelocity().length() < speedConsiderAsStop)
         {
+            cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << " Current_Speed: " << agent->getVelocity().length() << endl;
             agent->setCollisionStartTime(glutGet(GLUT_ELAPSED_TIME));
             // cout << "- Start collision: " << convertTime(agent->getCollisionStartTime()) << endl;
         }
@@ -717,6 +718,7 @@ void update()
         if (agent->getTotalStopTime() > stop_time_limit)
         {
             socialForce->removeAgent(agent->getId());
+            cout << "Remove agent: " << agent->getId() << " - Total stop time: " << agent->getTotalStopTime() << endl;
             continue;
         }
 
