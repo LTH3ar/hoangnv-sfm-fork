@@ -668,6 +668,7 @@ void normalKey(unsigned char key, int xMousePos, int yMousePos)
 // Update function to update the scene(to be called continuously to move the agents and AGVs)
 void update()
 {
+    int stop_time_limit = 3000; // 3 seconds
     static int prevTime;
     currTime = glutGet(GLUT_ELAPSED_TIME); // Get time in milliseconds since 'glutInit()' called
     int frameTime = currTime - prevTime;
@@ -690,6 +691,29 @@ void update()
         Point3f des = agent->getDestination();
         
         if (Utility::isPositionErr(src, walkwayWidth, juncData.size(), socialForce->getAGVs()))
+        {
+            socialForce->removeAgent(agent->getId());
+            continue;
+        }
+
+        // using similar mechinism to the AGV to check the collision, if the agent is moving and the speed is less than the speedConsiderAsStop then start the collision
+        // if the time of collision is more than 3 seconds then remove the agent
+        if (agent->getCollisionStartTime() == 0 && agent->getVelocity().length() < speedConsiderAsStop && agent->getIsMoving())
+        {
+            agent->setCollisionStartTime(glutGet(GLUT_ELAPSED_TIME));
+            // cout << "- Start collision: " << convertTime(agent->getCollisionStartTime()) << endl;
+        }
+
+        if (agent->getCollisionStartTime() != 0 && agent->getVelocity().length() > speedConsiderAsStop && agent->getIsMoving())
+        {
+            agent->setTotalStopTime(agent->getTotalStopTime() + glutGet(GLUT_ELAPSED_TIME) - agent->getCollisionStartTime());
+            // cout << "- Stop collision: " << convertTime(glutGet(GLUT_ELAPSED_TIME)) << endl;
+            // cout << "=> Total collision: " << convertTime(agent->getTotalStopTime()) << endl;
+            agent->setCollisionStartTime(0);
+        }
+
+        // remove the agent if the total stop time is more than 3 seconds
+        if (agent->getTotalStopTime() > stop_time_limit)
         {
             socialForce->removeAgent(agent->getId());
             continue;
