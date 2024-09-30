@@ -9,7 +9,7 @@
   },
   "timeRatio": {
     "description": "The time ratio of the demo simulation",
-    "value": 10
+    "value": 5
   },
   "jsonOutput": {
     "description": "Output file in JSON format",
