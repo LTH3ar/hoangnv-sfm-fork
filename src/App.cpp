@@ -722,6 +722,8 @@ void update()
             continue;
         }
 
+        // condition to force the agent to move around to another lane and go in the opposite direction to complete the circle when the agent is near destination
+
         if (agent->getVelocity().length() < LOWER_SPEED_LIMIT + 0.2 &&
             agent->getMinDistanceToWalls(socialForce->getWalls(), src, agent->getRadius()) < 0.2 &&
             (agent->interDes).size() == 0)
@@ -733,6 +735,26 @@ void update()
             agent->setPath(des.x, des.y, 1.0);
         }
 
+        float distanceToTarget = src.distance(des);
+
+        if (distanceToTarget <= 2)
+        {
+            Point3f intermediateDes = Utility::getIntermediateDes(src, walkwayWidth, walkwayWidth);
+
+            // inverse the direction of the agent by add - to the x and y
+            intermediateDes.x = -intermediateDes.x;
+            intermediateDes.y = -intermediateDes.y;
+
+            // inverse the true destination
+            des.x = -des.x;
+            des.y = -des.y;
+
+            (agent->interDes).push_back(intermediateDes);
+            agent->setPath(intermediateDes.x, intermediateDes.y, 1.0);
+            agent->setPath(des.x, des.y, 1.0);
+
+        }
+
         if ((agent->interDes).size() > 0)
         {
             float distanceToInterDes = src.distance((agent->interDes).front());
@@ -742,14 +764,16 @@ void update()
             }
         }
 
-        float distanceToTarget = src.distance(des);
+        
+
         if (distanceToTarget <= 1 || isnan(distanceToTarget))
         {
-            agent->setIsMoving(false);
-            if (!agent->getStopAtCorridor())
-            {
-                socialForce->removeAgent(agent->getId());
-            }
+            // agent->setIsMoving(false);
+            // if (!agent->getStopAtCorridor())
+            // {
+            //     socialForce->removeAgent(agent->getId());
+            // }
+            // inverse the true destination
             count_agents = count_agents + 1;
         }
         //cout << "AgentID: " << agent->getId() << " - Source: " << src << " - Destination: " << des << "Time: " << run_time << " Current_Speed: " << agent->getVelocity().length() << endl;
