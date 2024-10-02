@@ -431,11 +431,18 @@ void createAgentAlt(json agents)
         cout << "No agents in the previous event" << endl;
         createAgents();
     }
-
-    for (int i = 0; i < numOfPeople; i++)
+    else if (numOfPeople < inputData["numOfAgents"]["value"])
     {
-        agent = new Agent;
-        setAgentsFlowAlt(agent, agents[i]);
+        cout << "Number of agents in the previous event is less than the number of agents in the current event" << endl;
+        createAgents();
+    }
+    else
+    {
+        for (int i = 0; i < numOfPeople; i++)
+        {
+            agent = new Agent;
+            setAgentsFlowAlt(agent, agents[i]);
+        }
     }
 
     // // add more number of agents to compensate the number of agents: new agents = inputData["numOfAgents"]["value"] - numOfPeople
