@@ -19,7 +19,7 @@ def run_command(command, num_times):
     return hours, minutes, seconds, milliseconds
 
 # Example usage
-command = "./app data/input/input.json data/input/map.txt"
+command = "./app data/input/hallway_1_0.json data/input/hallway_1_0.txt 0"
 num_times = 1000
 
 hours, minutes, seconds, milliseconds = run_command(command, num_times)

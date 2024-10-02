@@ -158,7 +158,8 @@ int main(int argc, char **argv)
     startTime = currTime;
     if (graphicsMode == 0)
     {
-        glutHideWindow();
+        //glutHideWindow();
+        glutIconifyWindow();
     }
 
     init();                   // Initialization
