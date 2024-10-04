@@ -42,3 +42,6 @@ To run simulator
 ```cpp
 ./app <json file> <map(txt) file> <1 or 0>
 ```
+
+**Intergation with pathPlanningSimulation** <br/>
+- Just copy the `app` file to the `pathPlanningSimulation/model/hallway_simulator_module/sim/x86_64 or arm64/` folder then follow the instruction in the `pathPlanningSimulation` project.
