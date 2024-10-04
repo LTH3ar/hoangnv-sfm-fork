@@ -1,0 +1,20 @@
+{
+    "timeline": [
+        {
+            "agvIDs": [
+                0
+            ],
+            "arcID": "jhallway_1",
+            "end_time": 30,
+            "start_time": 0
+        },
+        {
+            "agvIDs": [
+                0
+            ],
+            "arcID": "hallway_1",
+            "end_time": 7,
+            "start_time": 0
+        }
+    ]
+}
