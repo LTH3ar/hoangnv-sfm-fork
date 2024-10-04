@@ -23,7 +23,6 @@ namespace Renderer
     void drawAGVs(
         SocialForce *socialForce,
         std::vector<float> juncData,
-        int agvRunConcurrently,
         int runMode);
 
     void drawCylinder(

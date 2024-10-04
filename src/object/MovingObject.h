@@ -39,6 +39,9 @@ public:
 
     Point3f getPath();
 
+    // additional function to get the path: get full path
+    std::deque<Waypoint> getFullPath() const { return path; }
+
     void setPath(float x, float y, float radius);
 
     Point3f getDestination() const { return destination; };
@@ -58,6 +61,10 @@ public:
     Point3f getAheadVector() const;
 
     float getOrientation();
+
+    // extra function to set/get velocity
+    void setVelocity(float x, float y, float z);
+    
 
     virtual void move(){};
 };

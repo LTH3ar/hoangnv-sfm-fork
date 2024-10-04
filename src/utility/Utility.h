@@ -8,6 +8,7 @@
 #include "lib/vecmath/vecmath.h"
 #include <map>
 #include "src/agv/AGV.h"
+#include "src/agent/Agent.h"
 
 using json = nlohmann::json;
 
@@ -24,20 +25,48 @@ namespace Utility
 
     json readInputData(const char *fileName);
 
+    int calculatePredictedTime(float hallwayLength, float desiredSpeed, float acceleration, float timeRatio);
+
     void writeResult(
         const char *fileName, std::string name, int mode, std::vector<AGV *> data,
         std::vector<json> juncDataList,
-        int agvRunConcurrently,
         int runMode,
-        int numRunPerHallway,
         int totalRunningTime,
-        int timeRatio);
+        string arcID,
+        int timeRatio,
+        int timeline_pointer,
+        int eventType,
+        vector<int> NewAgvIDs);
+
+    json SaveState(
+        // list of AGVs
+        std::vector<AGV *> agvs,
+        // list of Agents
+        std::vector<Agent *> agents,
+        // time stamp (ms)
+        float time,
+        int timeline_pointer
+    );
+
+    void writeState(
+        const char *fileName,
+        std::vector<json> stateList,
+        int timeline_pointer
+    );
+
+    void timeline_writer(
+        const char *fileName,
+        const char *arcID,
+        int start_time,
+        int end_time,
+        vector<int> agvIDs
+    );
+
+    int timeline_getter(const char *fileName);
 
     std::vector<int> getNumPedesInFlow(int junctionType, int totalPedestrian);
 
     std::vector<double> getPedesVelocity(int type, json inputData, float deviationParam);
-
-    std::vector<double> getPedesVelocityBasedTDis(int numPedes, double n_dist);
 
     std::vector<double> getPedesVelocityBasedDDis(json inputData, float deviationParam);
 

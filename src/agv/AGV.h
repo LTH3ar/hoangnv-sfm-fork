@@ -20,13 +20,21 @@ private:
     bool isCollision;
     int totalStopTime;
     int collisionStartTime;
+    int generalDirection;
+    bool reachDestination;
 
 public:
     AGV();
 
     ~AGV();
 
+    void setAgvIdx(int agvIdx);
+
     void setAgvSize(float width, float length);
+
+    void setReachDestination(bool reachDestination);
+
+    bool getReachDestination() const { return reachDestination; }
 
     float getWidth() const { return width; }
 
@@ -60,7 +68,11 @@ public:
 
     void setDirection(float x, float y);
 
+    void setGeneralDirection(int generalDirection);
+
     Vector3f getDirection() const { return direction; }
+
+    int getGeneralDirection() const { return generalDirection; }
 
     Point3f getNearestPoint(Point3f position_i);
 

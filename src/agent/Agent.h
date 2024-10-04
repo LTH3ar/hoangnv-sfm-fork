@@ -15,6 +15,8 @@ private:
     float radius;
     float impatient;
     bool stopAtCorridor;
+    int totalStopTime;
+    int collisionStartTime;
 
 public:
     Agent();
@@ -36,6 +38,14 @@ public:
     float getStopAtCorridor() const { return stopAtCorridor; }
 
     float getMinDistanceToWalls(vector<Wall *> walls, Point3f position, float radius);
+
+    int getTotalStopTime() const { return totalStopTime; }
+
+    void setTotalStopTime(int totalStopTime);
+
+    int getCollisionStartTime() const { return collisionStartTime; }
+
+    void setCollisionStartTime(int collisionStartTime);
 
     Vector3f getDrivingForce(const Point3f destination);
     Vector3f getAgentInteractForce(std::vector<Agent *> agents);

@@ -7,8 +7,7 @@ int AGV::agvIdx = -1;
 AGV::AGV()
 {
     MovingObject();
-    id = ++agvIdx;
-
+    id = 0;
     setAgvSize(0.35F, 0.75F);
     travelingTime = 0;
     numOfCollision = 0;
@@ -17,17 +16,30 @@ AGV::AGV()
     velocity.set(0.0, 0.0, 0.0);
     collisionStartTime = 0;
     totalStopTime = 0;
+    generalDirection = 0;
+    reachDestination = false;
 }
 
 AGV::~AGV()
 {
-    agvIdx--;
+    // agvIdx--;
+}
+
+void AGV::setAgvIdx(int agvIdx)
+{
+    this->agvIdx = agvIdx;
+    this->id = agvIdx;
 }
 
 void AGV::setAgvSize(float width, float length)
 {
     this->width = width;
     this->length = length;
+}
+
+void AGV::setReachDestination(bool reachDestination)
+{
+    this->reachDestination = reachDestination;
 }
 
 void AGV::setTravelingTime(int travelingTime)
@@ -71,6 +83,11 @@ void AGV::setPoints(Point3f pointA, Point3f pointB, Point3f pointC, Point3f poin
 void AGV::setDirection(float x, float y)
 {
     this->direction.set(x, y, 0.0F);
+}
+
+void AGV::setGeneralDirection(int generalDirection)
+{
+    this->generalDirection = generalDirection;
 }
 
 Point3f AGV::getNearestPoint(Point3f positionAgent)
@@ -148,9 +165,53 @@ bool AGV::isNearPedes(vector<Point3f> positionList)
     return false;
 }
 
+// void AGV::move(float stepTime, vector<Point3f> position_list)
+// {
+//     Vector3f velocityDiff, desiredVelocity, e_ij;
+
+//     e_ij = getPath() - position;
+//     e_ij.normalize();
+
+//     desiredVelocity = e_ij * desiredSpeed;
+//     velocityDiff = e_ij * acceleration * stepTime;
+
+//     if (isNearPedes(position_list))
+//     {
+//         if (!isCollision)
+//         {
+//             numOfCollision++;
+//         }
+//         isCollision = true;
+//         if (abs(velocity.x) >= abs(desiredVelocity.x) &&
+//             abs(velocity.y) >= abs(desiredVelocity.y))
+//         {
+//             position = position + velocity * stepTime;
+//             velocity = velocity - velocityDiff;
+//         }
+//         else
+//         {
+//             velocity.set(0, 0, 0);
+//         }
+//     }
+//     else
+//     {
+//         isCollision = false;
+//         if (velocity.length() < desiredVelocity.length())
+//         {
+//             position = position + velocity * stepTime;
+//             velocity = velocity + velocityDiff;
+//         }
+//         else
+//         {
+//             position = position + desiredVelocity * stepTime;
+//             velocity = desiredVelocity;
+//         }
+//     }
+// }
+
 void AGV::move(float stepTime, vector<Point3f> position_list)
 {
-    Vector3f velocityDiff, desiredVelocity, e_ij;
+    Vector3f desiredVelocity, e_ij, velocityDiff;
 
     e_ij = getPath() - position;
     e_ij.normalize();
@@ -175,11 +236,12 @@ void AGV::move(float stepTime, vector<Point3f> position_list)
         {
             velocity.set(0, 0, 0);
         }
+    
     }
     else
     {
         isCollision = false;
-        if (velocity.length() < desiredVelocity.length())
+        if ((velocity.length() < desiredVelocity.length()) && numOfCollision != 0)
         {
             position = position + velocity * stepTime;
             velocity = velocity + velocityDiff;
@@ -190,4 +252,33 @@ void AGV::move(float stepTime, vector<Point3f> position_list)
             velocity = desiredVelocity;
         }
     }
+
 }
+
+// void AGV::move(float stepTime, vector<Point3f> position_list)
+// {
+//     Vector3f desiredVelocity, e_ij;
+
+//     e_ij = getPath() - position;
+//     e_ij.normalize();
+
+//     desiredVelocity = e_ij * desiredSpeed;
+
+//     if (isNearPedes(position_list))
+//     {
+//         if (!isCollision)
+//         {
+//             numOfCollision++;
+//         }
+//         isCollision = true;
+//         velocity.set(0, 0, 0);
+//     }
+//     else
+//     {
+//         isCollision = false;
+//         velocity = desiredVelocity;
+//         position = position + velocity * stepTime;
+//     }
+
+    
+// }

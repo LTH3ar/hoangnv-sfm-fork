@@ -19,7 +19,6 @@ void Renderer::drawAgents(SocialForce *socialForce)
 void Renderer::drawAGVs(
     SocialForce *socialForce,
     std::vector<float> juncData,
-    int agvRunConcurrently,
     int runMode)
 {
     vector<AGV *> agvs = socialForce->getAGVs();
@@ -28,31 +27,21 @@ void Renderer::drawAGVs(
     if (runMode == 1)
     // if (false)
     {
-        AGV *agv1 = NULL;
-        AGV *agv2 = NULL;
+
         int i;
         vector<int> j;
 
         vector<AGV *> runningAGV;
 
+        runningAGV.clear();
         for (i = 0; i < agvs.size(); i++)
         {
             if (agvs[i]->getIsMoving() && agvs[i]->getTravelingTime() != 0)
             {
-                agv1 = agvs[i];
-                if (i < agvs.size() - 1 && agvRunConcurrently == 1 && i % 2 == 0)
-                {
-                    agv2 = agvs[i + 1];
-                    runningAGV.clear();
-                    runningAGV.insert(runningAGV.end(), {agv1, agv2});
-                }
-                else
-                {
-                    runningAGV.clear();
-                    runningAGV.insert(runningAGV.end(), {agv1});
-                }
-
-                break;
+                
+                //add to a {} and pass it to runningAGV
+                runningAGV.insert(runningAGV.end(), {agvs[i]});
+                
             }
             else if (!agvs[i]->getIsMoving() && agvs[i]->getTravelingTime() == 0)
             {
@@ -60,24 +49,19 @@ void Renderer::drawAGVs(
             }
         }
 
+        
         if (i == agvs.size())
         {
             if (j.size() > 0)
             {
-                agv1 = agvs[j.front()];
-                if (agvRunConcurrently == 1)
+                runningAGV.clear();
+                for (int k = 0; k < j.size(); k++)
                 {
-                    agv2 = agvs[agv1->getId() + 1];
-                    runningAGV.clear();
-                    runningAGV.insert(runningAGV.end(), {agv1, agv2});
-                }
-                else
-                {
-                    runningAGV.clear();
-                    runningAGV.insert(runningAGV.end(), {agv1});
+                    runningAGV.insert(runningAGV.end(), {agvs[j[k]]});
                 }
             }
         }
+
 
         if (runningAGV.size() > 0)
         {
@@ -122,47 +106,7 @@ void Renderer::drawAGVs(
             }
         }
     }
-    else if (juncData.size() == 2 && agvRunConcurrently == 1)
-    {
-        for (AGV *agv : agvs)
-        {
-            agv->setIsMoving(true);
-            if (agv->getTravelingTime() == 0)
-            {
-                agv->setTravelingTime(glutGet(GLUT_ELAPSED_TIME));
-            }
-            // Draw AGVs
-            glColor3f(agv->getColor().x, agv->getColor().y, agv->getColor().z);
-            float w, l;
-            Vector3f a, b;
-            Point3f top, bottom, pointA, pointB, pointC, pointD;
-            w = agv->getWidth();
-            l = agv->getLength();
-            e_ij = agv->getPath() - agv->getPosition();
-            e_ij.normalize();
-            top = agv->getPosition() + e_ij * l * 0.5F;
-            bottom = agv->getPosition() - e_ij * l * 0.5F;
 
-            a = Vector3f(e_ij.y, -e_ij.x, 0.0F);
-            a.normalize();
-            b = Vector3f(-e_ij.y, e_ij.x, 0.0F);
-            b.normalize();
-
-            pointA = top + a * w * 0.5F;
-            pointB = top + b * w * 0.5F;
-            pointC = bottom + b * w * 0.5F;
-            pointD = bottom + a * w * 0.5F;
-
-            agv->setPoints(pointA, pointB, pointC, pointD);
-
-            glBegin(GL_QUADS);
-            glVertex3f(pointA.x, pointA.y, 0);
-            glVertex3f(pointB.x, pointB.y, 0);
-            glVertex3f(pointC.x, pointC.y, 0);
-            glVertex3f(pointD.x, pointD.y, 0);
-            glEnd();
-        }
-    }
 }
 
 void Renderer::drawCylinder(float x, float y, float radius, int slices, float height)
@@ -218,8 +162,8 @@ void Renderer::drawWalls(SocialForce *socialForce)
     for (Wall *wall : walls)
     {
         glBegin(GL_LINES);
-        glVertex2f(wall->getStartPoint().x, wall->getStartPoint().y);
-        glVertex2f(wall->getEndPoint().x, wall->getEndPoint().y);
+        glVertex2f(wall->getStartPoint().x+2, wall->getStartPoint().y);
+        glVertex2f(wall->getEndPoint().x-2, wall->getEndPoint().y);
         glEnd();
     }
     glPopMatrix();

@@ -15,6 +15,8 @@ Agent::Agent()
     isMoving = true;
     stopAtCorridor = false;
     impatient = 0;
+    collisionStartTime = 0;
+    totalStopTime = 0;
 
     // Desired Speed Based on (Moussaid et al., 2009)
     normal_distribution<float> distribution(1.29F,
@@ -41,6 +43,16 @@ void Agent::setImpatient(float impatient)
 void Agent::setStopAtCorridor(bool stopAtCorridor)
 {
     this->stopAtCorridor = stopAtCorridor;
+}
+
+void Agent::setCollisionStartTime(int collisionStartTime)
+{
+    this->collisionStartTime = collisionStartTime;
+}
+
+void Agent::setTotalStopTime(int totalStopTime)
+{
+    this->totalStopTime = totalStopTime;
 }
 
 float Agent::getMinDistanceToWalls(vector<Wall *> walls, Point3f position, float radius)
