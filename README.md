@@ -40,5 +40,5 @@ make
 To run simulator
 
 ```cpp
-./app <json file> <map(txt) file>
+./app <json file> <map(txt) file> <1 or 0>
 ```
