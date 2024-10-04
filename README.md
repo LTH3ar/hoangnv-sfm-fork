@@ -33,6 +33,11 @@ This project also requires users to use compilers that support C++ 11.
 
 <!-- **Create a Pointer to the <code>SocialForce</code> Object** -->
 **Main commands** <br/>
+To clone the project
+```sh
+git clone https://github.com/LTH3ar/hoangnv-sfm-fork.git --branch main
+```
+
 To compile program
 ```cpp
 make
