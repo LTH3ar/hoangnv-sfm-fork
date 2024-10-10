@@ -76,6 +76,7 @@ void SocialForce::moveCrowd(float stepTime)
 void SocialForce::moveAGVs(float stepTime)
 {
     vector<Point3f> position_list;
+    vector<agvs_data> position_list_agv;
     for (Agent *agent : crowd)
     {
         if (agent->getPosition().distance(Vector3f(0, 0, 0)) > 12.0F)
@@ -83,11 +84,21 @@ void SocialForce::moveAGVs(float stepTime)
         position_list.push_back(agent->getPosition());
     }
 
+    // add agv position to the position list
+    for (AGV *agv : agvs) //assign the position of the AGV with the order of the AGV id
+    {
+        agvs_data agv_data;
+        agv_data.position = agv->getPosition();
+        agv_data.id = agv->getId();
+        agv_data.reachDestination = agv->getReachDestination();
+        position_list_agv.push_back(agv_data);
+    }
+
     for (AGV *agv : agvs)
     {
         if (agv->getIsMoving())
         {
-            agv->move(stepTime, position_list);
+            agv->move(stepTime, position_list, position_list_agv);
         }
     }
 }

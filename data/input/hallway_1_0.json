@@ -1,7 +1,7 @@
 {
     "numOfAgents": {
         "description": "Number of agents",
-        "value": 80
+        "value": 100
     },
     "TDDegree": {
         "description": "T-Distribution' degree of freedom",
@@ -65,20 +65,22 @@
     },
     "hallwayWidth": {
         "description": "Hallway width",
-        "value": 6
+        "value": 4
     },
     "agvDirections": {
         "description": "Run direction of the AGV: left to right (0), right to left (1)",
         "value": [
             0,
-            1
+            0,
+            0
         ]
     },
     "agvIDs": {
         "description": "AGV ID",
         "value": [
             0,
-            1
+            1,
+            2
         ]
     },
     "timeline_pointer": {

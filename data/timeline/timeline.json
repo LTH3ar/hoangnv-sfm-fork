@@ -10,10 +10,12 @@
         },
         {
             "agvIDs": [
-                0
+                0,
+                1,
+                2
             ],
             "arcID": "hallway_1",
-            "end_time": 7,
+            "end_time": 94,
             "start_time": 0
         }
     ]

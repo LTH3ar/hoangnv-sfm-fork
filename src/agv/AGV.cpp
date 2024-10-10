@@ -165,6 +165,39 @@ bool AGV::isNearPedes(vector<Point3f> positionList)
     return false;
 }
 
+// compare the position of the other AGV with this AGV if the other AGV is in front of this AGV
+bool isInFront(Point3f position, Point3f positionOther, int generalDirection)
+{
+    if (generalDirection == 0)
+    {
+        if (position.x < positionOther.x)
+        {
+            return true;
+        }
+    }
+    else if (generalDirection == 1)
+    {
+        if (position.x > positionOther.x)
+        {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool AGV::isNearAGV(std::vector<agvs_data> position_list_agv)
+{
+    // combine with isInfront function to check if the AGV is in front of this AGV
+    for (agvs_data agv : position_list_agv)
+    {
+        if (getNearestPoint(agv.position).distance(agv.position) < thresholdDisToPedes*2 && isInFront(position, agv.position, generalDirection) && id != agv.id && !agv.reachDestination)
+        {
+            return true;
+        }
+    }
+}
+
 // void AGV::move(float stepTime, vector<Point3f> position_list)
 // {
 //     Vector3f velocityDiff, desiredVelocity, e_ij;
@@ -209,7 +242,7 @@ bool AGV::isNearPedes(vector<Point3f> positionList)
 //     }
 // }
 
-void AGV::move(float stepTime, vector<Point3f> position_list)
+void AGV::move(float stepTime, vector<Point3f> position_list, std::vector<agvs_data> position_list_agv)
 {
     Vector3f desiredVelocity, e_ij, velocityDiff;
 
@@ -219,8 +252,13 @@ void AGV::move(float stepTime, vector<Point3f> position_list)
     desiredVelocity = e_ij * desiredSpeed;
     velocityDiff = e_ij * acceleration * stepTime;
 
-    if (isNearPedes(position_list))
+    if (isNearPedes(position_list) || isNearAGV(position_list_agv))
+    //if (isNearPedes(position_list))
     {
+        if (isNearAGV(position_list_agv))
+        {
+            cout << "AGV " << id << " is near AGV" << endl;
+        }
         if (!isCollision)
         {
             numOfCollision++;

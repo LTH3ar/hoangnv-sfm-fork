@@ -6,6 +6,16 @@
 #include <vector>
 #include "../object/MovingObject.h"
 
+struct agvs_data
+{
+    //position
+    Point3f position;
+    //id
+    int id;
+    // reach destination
+    bool reachDestination;
+};
+
 class AGV : public MovingObject
 {
 private:
@@ -78,8 +88,13 @@ public:
 
     bool isNearPedes(std::vector<Point3f> position_list);
 
+    // is near another AGV but the difference is the only stop when another AGV is blocking the way of this AGV
+    bool isNearAGV(std::vector<agvs_data> position_list_agv);
+
+    bool isNearAnyThing(std::vector<Point3f> position_list, std::vector<int> ids_list_agv, std::vector<Point3f> position_list_agv);
+
     using MovingObject::move;
-    void move(float stepTime, std::vector<Point3f> position_list);
+    void move(float stepTime, std::vector<Point3f> position_list, std::vector<agvs_data> position_list_agv);
 };
 
 #endif
